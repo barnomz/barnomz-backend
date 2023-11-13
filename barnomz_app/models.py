@@ -1,14 +1,27 @@
 from django.db import models
 
+MAJOR_CHOICES = (
+    ('CE', 'Computer Engineering'), ('CS', 'Computer Science'),
+    ('EE', 'Electrical Engineering'), ('MSE', 'Material Science Engineering'),
+    ('AE', 'Aerospace Engineering'), ('ME', 'Mechanical Engineering'),
+    ('CHE', 'Chemical Engineering'), ('IE', 'Industrial Engineering'),
+    ('AM', 'Applied Mathematics'), ('P', 'Physics'), ('E', 'Economics')
+)
+
+DEPARTMENT_CHOICES = (
+    ('CE', 'Computer Engineering'), ('EE', 'Electrical Engineering'),
+    ('MSE', 'Material Science Engineering'), ('AE', 'Aerospace Engineering'),
+    ('ME', 'Mechanical Engineering'), ('CHE', 'Chemical Engineering'),
+    ('IE', 'Industrial Engineering'), ('MS', 'Mathematical Science'),
+    ('P', 'Physics'), ('E', 'Economics')
+)
+
+DAY_OF_WEEK_CHOICES = (
+    ('Saturday', 'Saturday'), ('Sunday', 'Sunday'), ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'),
+)
 
 class Student(models.Model):
-    MAJOR_CHOICES = (
-        ('CE', 'Computer Engineering'), ('CS', 'Computer Science'),
-        ('EE', 'Electrical Engineering'), ('MSE', 'Material Science Engineering'),
-        ('AE', 'Aerospace Engineering'), ('ME', 'Mechanical Engineering'),
-        ('CHE', 'Chemical Engineering'), ('IE', 'Industrial Engineering'),
-        ('AM', 'Applied Mathematics'), ('P', 'Physics'), ('E', 'Economics')
-    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     student_number = models.CharField(max_length=20, unique=True)
@@ -20,13 +33,6 @@ class Student(models.Model):
 
 
 class Department(models.Model):
-    DEPARTMENT_CHOICES = (
-        ('CE', 'Computer Engineering'), ('EE', 'Electrical Engineering'),
-        ('MSE', 'Material Science Engineering'), ('AE', 'Aerospace Engineering'),
-        ('ME', 'Mechanical Engineering'), ('CHE', 'Chemical Engineering'),
-        ('IE', 'Industrial Engineering'), ('MS', 'Mathematical Science'),
-        ('P', 'Physics'), ('E', 'Economics')
-    )
     name = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
     head_of_department = models.ForeignKey('Professor', on_delete=models.SET_NULL, null=True,
                                            blank=True, related_name='department_head')
@@ -69,10 +75,6 @@ class Classroom(models.Model):
 
 
 class Schedule(models.Model):
-    DAY_OF_WEEK_CHOICES = (
-        ('Saturday', 'Saturday'), ('Sunday', 'Sunday'), ('Monday', 'Monday'),
-        ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'),
-    )
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     professor = models.ForeignKey('Professor', on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)

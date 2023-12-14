@@ -22,12 +22,12 @@ DAY_OF_WEEK_CHOICES = (
 )
 
 
+# TODO: user based
 class Student(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     student_number = models.CharField(max_length=20, unique=True)
-    major = models.CharField(max_length=20, choices=MAJOR_CHOICES)
-    enrollment_year = models.PositiveIntegerField()
+    password = models.CharField(max_length=32)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.student_number}"
@@ -35,8 +35,6 @@ class Student(models.Model):
 
 class Department(models.Model):
     name = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
-    head_of_department = models.ForeignKey('Professor', on_delete=models.SET_NULL, null=True,
-                                           blank=True, related_name='department_head')
 
     def __str__(self):
         return self.name
@@ -65,11 +63,7 @@ class Course(models.Model):
 
 class Classroom(models.Model):
     building = models.CharField(max_length=30)
-    class_number = models.PositiveIntegerField()
-    capacity = models.PositiveIntegerField()
-    projector_available = models.BooleanField(default=False)
-    whiteboard_available = models.BooleanField(default=True)
-    wheelchair_accessible = models.BooleanField(default=False)
+    class_name = models.CharField(max_length=10)
 
     def __str__(self):
         return f"{self.building} - Room {self.class_number}"

@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Student, Department, Professor, Course, Classroom, Schedule
+from .models import User, Department, Professor, Course, Classroom, Schedule
 
 
-@admin.register(Student)
+@admin.register(User)
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'student_number', 'major', 'enrollment_year')
     search_fields = ('first_name', 'last_name', 'student_number')

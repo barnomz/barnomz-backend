@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from barnomz_app import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('api/register/', views.register, name='api_register'),
+    path('api/login/', views.login, name='api_login'),
+    path('api/logout/', views.logout, name='api_logout'),
 ]

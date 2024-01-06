@@ -1,10 +1,19 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
-from models import MAJOR_CHOICES
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django_recaptcha.fields import ReCaptchaField
+
+from models import *
 
 
-class LoginForm(AuthenticationForm):
-    username = forms.CharField(label='Username', max_length=255)
-    password = forms.CharField(label='Password', max_length=32, widget=forms.PasswordInput)
-    student_number = forms.CharField(label='Student Number', max_length=20)
-    major = forms.ChoiceField(label='Major', choices=MAJOR_CHOICES)
+class RegisterForm(UserCreationForm):
+    captcha = ReCaptchaField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'student_number', 'major']
+        captcha = ReCaptchaField()
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)

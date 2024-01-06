@@ -4,8 +4,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .serializers import UserSerializer
+from rest_framework.views import APIView
+
+from .models import Schedule
+from .serializers import UserSerializer, ScheduleSerializer
 from rest_framework.authtoken.models import Token
+
 
 # use this decorator to make sure that the user is authenticated before accessing the views that need users to login
 # @authentication_classes([TokenAuthentication])
@@ -48,3 +52,15 @@ def login(request):
 def logout(request):
     request.auth.delete()
     return Response(status=status.HTTP_200_OK)
+
+
+class ScheduleList(APIView):
+    def get(self, request, format=None):
+        user_id = request.user.id
+        schedules = Schedule.objects.filter(user=user_id)
+        serializer = ScheduleSerializer(schedules, many=True)
+        return Response({
+            "status": "success",
+            "message": "Schedules retrieved successfully.",
+            "data": serializer.data
+        })

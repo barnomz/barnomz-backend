@@ -64,3 +64,24 @@ class ScheduleList(APIView):
             "message": "Schedules retrieved successfully.",
             "data": serializer.data
         })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_schedule(request):
+    serializer = ScheduleSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_schedule(request, schedule_id):
+    try:
+        schedule = Schedule.objects.get(pk=schedule_id, user=request.user)
+        schedule.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Schedule.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)

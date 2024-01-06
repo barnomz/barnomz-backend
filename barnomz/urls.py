@@ -1,14 +1,12 @@
 from django.contrib import admin
 from django.urls import path
-from barnomz_app import views
-from barnomz_app.views import ScheduleList, add_schedule, remove_schedule, add_course_to_schedule, \
-    remove_course_from_schedule, make_schedule_public, duplicate_schedule, GetAllDepartments, GetCoursesOfDepartment
+from barnomz_app.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/register/', views.register, name='api_register'),
-    path('api/login/', views.login, name='api_login'),
-    path('api/logout/', views.logout, name='api_logout'),
+    path('api/register/', register, name='api_register'),
+    path('api/login/', login, name='api_login'),
+    path('api/logout/', logout, name='api_logout'),
     path('api/schedules/', ScheduleList.as_view(), name='schedule_list'),
     path('api/schedules/', ScheduleList.as_view(), name='schedule_list'),
     path('api/schedules/', add_schedule, name='add_schedule'),
@@ -19,5 +17,6 @@ urlpatterns = [
     path('api/schedules/<int:schedule_id>/duplicate', duplicate_schedule, name='duplicate_schedule'),
     path('departments', GetAllDepartments.as_view(), name='get_all_departments'),
     path('departments/<int:department_id>/courses', GetCoursesOfDepartment.as_view(), name='get_courses_of_department'),
-
+    path('schedules/public', FilterPublicSchedules.as_view(), name='filter_public_schedules'),
+    path('lecturers/<int:lecturer_id>', GetLecturerInfo.as_view(), name='get_lecturer_info'),
 ]

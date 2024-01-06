@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
-from .models import Schedule, ClassSession, Department, Course
-from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer
+from .models import Schedule, ClassSession, Department, Course, Professor
+from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, ProfessorSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -168,5 +168,30 @@ class GetCoursesOfDepartment(APIView):
         return Response({
             "status": "success",
             "message": "Courses retrieved successfully.",
+            "data": serializer.data
+        })
+
+
+class GetLecturerInfo(APIView):
+    def get(self, request, lecturer_id, format=None):
+        lecturer = Professor.objects.get(pk=lecturer_id)
+        serializer = ProfessorSerializer(lecturer)
+        return Response({
+            "status": "success",
+            "message": "Lecturer info retrieved successfully.",
+            "data": serializer.data
+        })
+
+# Todo: make this specific and fixed
+class FilterPublicSchedules(APIView):
+    def post(self, request, format=None):
+        course_ids = request.data.get('filters', [])
+        schedules = Schedule.objects.filter(status="public")
+        for course_id in course_ids:
+            schedules = schedules.filter(classes__course__id=course_id)
+        serializer = ScheduleSerializer(schedules, many=True)
+        return Response({
+            "status": "success",
+            "message": "Filtered schedules retrieved successfully.",
             "data": serializer.data
         })

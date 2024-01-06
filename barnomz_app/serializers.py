@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from barnomz_app.models import User, Course, Department
-from .models import Schedule, ClassSession
+from barnomz_app.models import *
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -45,3 +44,23 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class ProfessorSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    college = serializers.CharField(source='department.name')  # Assuming department has a 'name' field
+    rate = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Professor
+        fields = ['id', 'name', 'college', 'number_of_votes', 'rate']
+
+    @staticmethod
+    def get_name(obj):
+        return f"Dr. {obj.first_name} {obj.last_name}"
+
+    @staticmethod
+    def get_rate(obj):
+        return {
+            "teachQuality": obj.teaching_rate,
+            "scoring": obj.exam_difficulty_rate,
+            "morality": obj.communication_rate
+        }

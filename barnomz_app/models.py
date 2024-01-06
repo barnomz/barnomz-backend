@@ -66,19 +66,18 @@ class Course(models.Model):
     course_code = models.CharField(max_length=20, unique=True)
     unit_count = models.PositiveIntegerField()
     offered_by = models.ForeignKey('Professor', on_delete=models.CASCADE)
-    group = models.PositiveIntegerField(max_length=10)
+    group = models.PositiveIntegerField()
     day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    location = models.ForeignKey('Classroom', on_delete=models.SET_NULL)
+    location = models.ForeignKey('Classroom', null=True, on_delete=models.SET_NULL)
     final_exam_date = models.DateTimeField()
     number_of_petitioners = models.PositiveIntegerField()
     number_of_capacity = models.PositiveIntegerField()
     number_of_enrolled = models.PositiveIntegerField()
-    professor = models.ForeignKey('Professor', on_delete=models.SET_NULL)
-    session = models.ForeignKey('ClassSession', on_delete=models.SET_NULL)
-    department = models.ForeignKey('Department', on_delete=models.SET_NULL)
-    prerequisite = models.ForeignKey('Course', on_delete=models.SET_NULL)
+    session = models.ForeignKey('ClassSession', on_delete=models.SET_NULL, null=True)
+    department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
+    prerequisite = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True)
 
     def add_new_course(self, course_name, course_code, unit_count, offered_by, group, day_of_week, start_time,
                        end_time, location, final_exam_date, number_of_Petitioners, number_of_capacity,
@@ -109,14 +108,14 @@ class Classroom(models.Model):
 
 
 class ClassSession(models.Model):
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    course_session = models.ForeignKey('Course', on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    location = models.ForeignKey('Classroom', on_delete=models.SET_NULL)
+    location = models.ForeignKey('Classroom', on_delete=models.SET_NULL, null=True)
 
     def make_custom_session(self, course, day_of_week, start_time, end_time, location):
-        self.course = course
+        self.course_session = course
         self.day_of_week = day_of_week
         self.start_time = start_time
         self.end_time = end_time
@@ -128,7 +127,7 @@ class Schedule(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     classes = models.ManyToManyField('ClassSession')
-    status = models.CharField(max_length=10, choices=["public", "private"])
+    status = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')])
     is_default = models.BooleanField()
 
     def add_new_schedule(self, user, name, classes, status, is_default):

@@ -1,4 +1,5 @@
 import requests
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -130,3 +131,20 @@ def make_schedule_public(request, schedule_id):
     except Schedule.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def duplicate_schedule(request, schedule_id):
+    schedule_to_duplicate = get_object_or_404(Schedule, pk=schedule_id, status="public")
+    new_schedule = Schedule()
+    new_schedule.user = request.user
+    new_schedule.name = schedule_to_duplicate.name + " (Copy)"
+    new_schedule.status = "private"
+    new_schedule.is_default = False
+    new_schedule.save()
+    for class_session in schedule_to_duplicate.classes.all():
+        new_schedule.classes.add(class_session)
+    new_schedule.save()
+    all_schedules = Schedule.objects.filter(user=request.user)
+    serializer = ScheduleSerializer(all_schedules, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

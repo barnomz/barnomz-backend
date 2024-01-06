@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
-from .models import Schedule
+from .models import Schedule, ClassSession
 from .serializers import UserSerializer, ScheduleSerializer
 from rest_framework.authtoken.models import Token
 
@@ -85,3 +85,48 @@ def remove_schedule(request, schedule_id):
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Schedule.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_course_to_schedule(request, schedule_id):
+    try:
+        schedule = Schedule.objects.get(pk=schedule_id, user=request.user)
+        course_data = request.data
+        course = ClassSession.objects.get(pk=course_data['id'])
+        schedule.classes.add(course)
+        schedule.save()
+        all_schedules = Schedule.objects.filter(user=request.user)
+        serializer = ScheduleSerializer(all_schedules, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except (Schedule.DoesNotExist, ClassSession.DoesNotExist):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_course_from_schedule(request, schedule_id):
+    try:
+        schedule = Schedule.objects.get(pk=schedule_id, user=request.user)
+        course_data = request.data
+        course = ClassSession.objects.get(pk=course_data['id'])
+        schedule.classes.remove(course)
+        schedule.save()
+        all_schedules = Schedule.objects.filter(user=request.user)
+        serializer = ScheduleSerializer(all_schedules, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except (Schedule.DoesNotExist, ClassSession.DoesNotExist):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def make_schedule_public(request, schedule_id):
+    try:
+        schedule = Schedule.objects.get(pk=schedule_id, user=request.user)
+        schedule.status = "public"
+        schedule.save()
+        return Response(status=status.HTTP_200_OK)
+    except Schedule.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+

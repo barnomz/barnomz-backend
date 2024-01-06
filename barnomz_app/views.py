@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
-from .models import Schedule, ClassSession
-from .serializers import UserSerializer, ScheduleSerializer
+from .models import Schedule, ClassSession, Department, Course
+from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -148,3 +148,25 @@ def duplicate_schedule(request, schedule_id):
     all_schedules = Schedule.objects.filter(user=request.user)
     serializer = ScheduleSerializer(all_schedules, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetAllDepartments(APIView):
+    def get(self, request, format=None):
+        departments = Department.objects.all()
+        serializer = DepartmentSerializer(departments, many=True)
+        return Response({
+            "status": "success",
+            "message": "Departments retrieved successfully.",
+            "data": serializer.data
+        })
+
+
+class GetCoursesOfDepartment(APIView):
+    def get(self, request, department_id, format=None):
+        courses = Course.objects.filter(department_id=department_id)
+        serializer = CourseSerializer(courses, many=True)
+        return Response({
+            "status": "success",
+            "message": "Courses retrieved successfully.",
+            "data": serializer.data
+        })

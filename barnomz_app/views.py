@@ -7,8 +7,9 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
-from .models import Schedule, ClassSession, Department, Course, Professor
-from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, ProfessorSerializer
+from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors
+from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
+    ProfessorSerializer, CommentSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -182,6 +183,7 @@ class GetLecturerInfo(APIView):
             "data": serializer.data
         })
 
+
 # Todo: make this specific and fixed
 class FilterPublicSchedules(APIView):
     def post(self, request, format=None):
@@ -193,5 +195,16 @@ class FilterPublicSchedules(APIView):
         return Response({
             "status": "success",
             "message": "Filtered schedules retrieved successfully.",
+            "data": serializer.data
+        })
+
+
+class GetAllReviewsAboutLecturer(APIView):
+    def get(self, request, lecturer_id, format=None):
+        comments = CommentOnProfessors.objects.filter(professor_id=lecturer_id, is_deleted=False)
+        serializer = CommentSerializer(comments, many=True)
+        return Response({
+            "status": "success",
+            "message": "Reviews retrieved successfully.",
             "data": serializer.data
         })

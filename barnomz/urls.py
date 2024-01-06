@@ -19,4 +19,6 @@ urlpatterns = [
     path('departments/<int:department_id>/courses', GetCoursesOfDepartment.as_view(), name='get_courses_of_department'),
     path('schedules/public', FilterPublicSchedules.as_view(), name='filter_public_schedules'),
     path('lecturers/<int:lecturer_id>', GetLecturerInfo.as_view(), name='get_lecturer_info'),
+    path('lecturers/<int:lecturer_id>/reviews', GetAllReviewsAboutLecturer.as_view(),
+         name='get_all_reviews_about_lecturer'),
 ]

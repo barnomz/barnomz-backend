@@ -21,4 +21,6 @@ urlpatterns = [
     path('lecturers/<int:lecturer_id>', GetLecturerInfo.as_view(), name='get_lecturer_info'),
     path('lecturers/<int:lecturer_id>/reviews', GetAllReviewsAboutLecturer.as_view(),
          name='get_all_reviews_about_lecturer'),
+    path('comments/add/', AddComment.as_view(), name='add_comment'),
+    path('comments/remove/<int:comment_id>/', RemoveComment.as_view(), name='remove_comment'),
 ]

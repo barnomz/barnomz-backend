@@ -69,5 +69,4 @@ class ProfessorSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentOnProfessors
-        fields = ['id', 'date', 'text', 'rate', 'knowledge_rate', 'teaching_rate', 'communication_rate',
-                  'exam_difficulty_rate']
+        exclude = ['is_deleted']

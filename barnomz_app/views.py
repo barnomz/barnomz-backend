@@ -208,3 +208,24 @@ class GetAllReviewsAboutLecturer(APIView):
             "message": "Reviews retrieved successfully.",
             "data": serializer.data
         })
+
+
+class AddComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemoveComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, comment_id, format=None):
+        comment = get_object_or_404(CommentOnProfessors, pk=comment_id)
+        comment.is_deleted = True
+        comment.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

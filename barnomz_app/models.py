@@ -50,8 +50,7 @@ class Department(models.Model):
 
 
 class Professor(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255)
     department = models.ForeignKey('Department', on_delete=models.CASCADE)
     rate = models.FloatField()
     knowledge_rate = models.FloatField()
@@ -70,7 +69,6 @@ class Course(models.Model):
     day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    location = models.ForeignKey('Classroom', null=True, on_delete=models.SET_NULL)
     final_exam_date = models.DateTimeField()
     number_of_petitioners = models.PositiveIntegerField()
     number_of_capacity = models.PositiveIntegerField()
@@ -102,17 +100,11 @@ class Course(models.Model):
         self.save()
 
 
-class Classroom(models.Model):
-    building = models.CharField(max_length=30)
-    class_name = models.CharField(max_length=10)
-
-
 class ClassSession(models.Model):
     course_session = models.ForeignKey('Course', on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    location = models.ForeignKey('Classroom', on_delete=models.SET_NULL, null=True)
 
     def make_custom_session(self, course, day_of_week, start_time, end_time, location):
         self.course_session = course

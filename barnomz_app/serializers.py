@@ -7,7 +7,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'course_name', 'course_code', 'unit_count', 'offered_by', 'group', 'day_of_week', 'start_time',
-                  'end_time', 'location', 'final_exam_date', 'number_of_petitioners', 'number_of_capacity',
+                  'end_time', 'final_exam_date', 'number_of_petitioners', 'number_of_capacity',
                   'number_of_enrolled', 'professor', 'session', 'department', 'prerequisite']
 
 
@@ -46,16 +46,16 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 class ProfessorSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    college = serializers.CharField(source='department.name')  # Assuming department has a 'name' field
+    department = serializers.CharField(source='department.name')
     rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Professor
-        fields = ['id', 'name', 'college', 'number_of_votes', 'rate']
+        fields = ['id', 'full_name', 'college', 'number_of_votes', 'rate']
 
     @staticmethod
     def get_name(obj):
-        return f"Dr. {obj.first_name} {obj.last_name}"
+        return f"Dr. {obj.full_name}"
 
     @staticmethod
     def get_rate(obj):

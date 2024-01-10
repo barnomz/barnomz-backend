@@ -261,11 +261,8 @@ def dislike_comment(request, comment_id):
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def filling_data(request):
-    try:
-        reset_edu_data()
-        print("salam")
-        return Response({'message': 'SUCCESS.'})
-    except:
-        return Response({'message': 'Failed.'}, status=status.HTTP_404_NOT_FOUND)
+    reset_edu_data()
+    print("salam")
+    return Response({'message': 'SUCCESS.'})

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, time
 import gettext
 
-gettext.install('barnomz', localedir=None, codeset=None)
+gettext.install('barnomz', localedir=None)
 _ = gettext.gettext
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
@@ -102,7 +102,7 @@ class Professor(models.Model):
 
     def fill(self, full_name, department):
         self.full_name = full_name
-        self.department = ""
+        self.department = department
         self.rate = 0
         self.knowledge_rate = 0
         self.teaching_rate = 0
@@ -125,18 +125,18 @@ class Course(models.Model):
     number_of_capacity = models.PositiveIntegerField()
     number_of_enrolled = models.PositiveIntegerField()
     department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
-    info = models.CharField(max_length=255, default="")
+    info = models.CharField(max_length=512, default="")
     prerequisite_text = models.CharField(max_length=255, default="")
-    warning = models.CharField(max_length=255, default="")
+    warning = models.CharField(max_length=512, default="")
     grade = models.CharField(max_length=32, choices=GRADE_CHOICES, default="Bsc")
 
-    def add_new_course(self, course_name, course_code, unit_count, offered_by, group,
+    def add_new_course(self, course_name, course_code, unit_count, presented_by, group,
                        location, final_exam_date, final_exam_time, number_of_Petitioners,
                        number_of_capacity, number_of_enrolled, department, info, warning, grade):
         self.course_name = course_name
         self.course_code = course_code
         self.unit_count = unit_count
-        self.offered_by = offered_by
+        self.presented_by = presented_by
         self.group = group
         self.location = location
         self.final_exam_date = final_exam_date
@@ -150,10 +150,30 @@ class Course(models.Model):
         self.group = group
         self.save()
 
+    def fill(self, course_name, course_code, unit_count, presented_by, group,
+             location, final_exam_date, final_exam_time, number_of_capacity,
+             number_of_enrolled, department, info, warning, grade):
+        self.course_name = course_name
+        self.course_code = course_code
+        self.unit_count = unit_count
+        self.presented_by = presented_by
+        self.group = group
+        self.location = location
+        self.final_exam_date = final_exam_date
+        self.final_exam_time = final_exam_time
+        self.number_of_petitioners = 0
+        self.number_of_capacity = number_of_capacity
+        self.number_of_enrolled = number_of_enrolled
+        self.department = department
+        self.info = info
+        self.warning = warning
+        self.group = group
+        self.save()
+
 
 class Classroom(models.Model):
-    building = models.CharField(max_length=30)
-    class_name = models.CharField(max_length=10)
+    building = models.CharField(max_length=64)
+    class_name = models.CharField(max_length=128)
 
     def fill(self, building, class_name):
         self.building = building

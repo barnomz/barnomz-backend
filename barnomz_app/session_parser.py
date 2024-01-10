@@ -30,7 +30,7 @@ class SessionParser:
 
     def step_S(self):
         token = self.get_token()
-        if (token == '$'):
+        if token == '$':
             return
 
         if not token in SessionParser.terminals:
@@ -58,13 +58,13 @@ class SessionParser:
             return
 
         token = self.next_token()
-        if SessionParser.assert_time(token) == False:
+        if not SessionParser.assert_time(token):
             print(f"concern in step_P: not a time ({token})")
             return
-        s = token
+        s = SessionParser.fix_time(token)
 
         token = self.next_token()
-        if (token != 'تا'):
+        if token != 'تا':
             print("concern: no تا")
             return
 
@@ -72,7 +72,7 @@ class SessionParser:
         if not SessionParser.assert_time(token):
             print(f"concern in step_P: not a time ({token})")
             return
-        e = token
+        e = SessionParser.fix_time(token)
 
         self.next_token()  # move forward since we captured the token
 
@@ -115,7 +115,13 @@ class SessionParser:
             else:
                 new_arr.append(other)
                 i = i + 1
-        return ' '.join(new_arr)
+        joined = ' '.join(new_arr)
+        return joined
+
+    def fix_time(string):
+        if ":" not in string:
+            return string + ":00"
+        return string
 
     def assert_time(token):
         matches = re.match("^([0-9]{1,2})(:([0-9]{1,2}))?$", token)
@@ -123,9 +129,8 @@ class SessionParser:
             return False
         return True
 
-
-string = 'یکشنبه از ساعت 15 تا 16:30وسه شنبه از ساعت 15 تا 16:30وپنجشنبه از ساعت 10:30 تا 12وپنجشنبه از ساعت 15 تا ' \
-         '16:30 '
-parser = SessionParser()
-parser.parse(string)
-print(parser.objects)
+# string = 'یکشنبه از ساعت 15 تا 16:30وسه شنبه از ساعت 15 تا 16:30وپنجشنبه از ساعت 10:30 تا 12وپنجشنبه از ساعت 15 تا ' \
+#         '16:30 '
+# parser = SessionParser()
+# parser.parse(string)
+# print(parser.objects)

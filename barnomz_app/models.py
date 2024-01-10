@@ -19,7 +19,18 @@ DEPARTMENT_CHOICES = (
 DAY_OF_WEEK_CHOICES = (
     ('Saturday', 'Saturday'), ('Sunday', 'Sunday'), ('Monday', 'Monday'),
     ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'),
+    #('SatMon', 'Saturday and Monday'), ('SunTue', 'Sunday and Tuesday'),
 )
+
+GRADE_CHOICES=(
+        ('Bsc', 'کارشناسی'),
+        ('Msc', 'کارشناسی-ارشد')
+        )
+
+STRICTNESS_CHOICES = {
+        ('strict', 'پیشنیاز'),
+        ('loose', 'هنمیاز')
+        }
 
 
 class User(models.Model):
@@ -46,12 +57,16 @@ class User(models.Model):
 
 class Department(models.Model):
     name = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10) # temporarily remove unique condition
+
+    def fill(self, name, code):
+        self.name = name
+        self.code = code
+        self.save()
 
 
 class Professor(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255, primary_key=True)
     department = models.ForeignKey('Department', on_delete=models.CASCADE)
     rate = models.FloatField()
     knowledge_rate = models.FloatField()
@@ -60,51 +75,77 @@ class Professor(models.Model):
     exam_difficulty_rate = models.FloatField()
     number_of_votes = models.PositiveIntegerField()
 
+    def fill(self, full_name, department):
+        self.full_name = full_name
+        self.department = ""
+        self.rate = 0
+        self.knowledge_rate = 0
+        self.teaching_rate = 0
+        self.communication_rate = 0
+        self.exam_difficulty_rate = 0
+        self.number_of_votes = 0
+        self.save()
+        
+
 
 class Course(models.Model):
     course_name = models.CharField(max_length=255)
-    course_code = models.CharField(max_length=20, unique=True)
+    course_code = models.CharField(max_length=20, unique=True, primary_key=True)
     unit_count = models.PositiveIntegerField()
-    offered_by = models.ForeignKey('Professor', on_delete=models.CASCADE)
+    presented_by = models.ForeignKey('Professor', on_delete=models.CASCADE)
     group = models.PositiveIntegerField()
-    day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
     location = models.ForeignKey('Classroom', null=True, on_delete=models.SET_NULL)
-    final_exam_date = models.DateTimeField()
+    final_exam_date = models.CharField(max_length=64)
+    final_exam_time = models.TimeField()
     number_of_petitioners = models.PositiveIntegerField()
     number_of_capacity = models.PositiveIntegerField()
     number_of_enrolled = models.PositiveIntegerField()
-    session = models.ForeignKey('ClassSession', on_delete=models.SET_NULL, null=True)
-    department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
-    prerequisite = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True)
+    department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True) 
+    info = models.CharField(max_length=255)
+    prerequisite_text = models.CharField(max_length=255, default="")
+    warning = models.CharField(max_length=255)
+    grade = models.CharField(max_length=32, choices=GRADE_CHOICES)
 
-    def add_new_course(self, course_name, course_code, unit_count, offered_by, group, day_of_week, start_time,
-                       end_time, location, final_exam_date, number_of_Petitioners, number_of_capacity,
-                       number_of_enrolled, professor, session, department, prerequisite):
+    def add_new_course(self, course_name, course_code, unit_count, offered_by, group,
+                       location, final_exam_date, final_exam_time, number_of_Petitioners,
+                       number_of_capacity, number_of_enrolled, department, info, warning, grade):
         self.course_name = course_name
         self.course_code = course_code
         self.unit_count = unit_count
         self.offered_by = offered_by
         self.group = group
-        self.day_of_week = day_of_week
-        self.start_time = start_time
-        self.end_time = end_time
         self.location = location
         self.final_exam_date = final_exam_date
+        self.final_exam_time = final_exam_time
         self.number_of_petitioners = number_of_Petitioners
         self.number_of_capacity = number_of_capacity
         self.number_of_enrolled = number_of_enrolled
-        self.professor = professor
-        self.session = session
         self.department = department
-        self.prerequisite = prerequisite
+        self.info = info
+        self.warning = warning
+        self.group = group
         self.save()
 
+class Prerequisite(models.Model):
+    for_course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    prerequisite = models.ForeignKey('Course', on_delete=models.CASCADE)
+    strictness = models.CharField(max_length=64, choices=STRICTNESS_CHOICES)
+
+    def fill(self, for_course, prerequisite, strictness='strict'):
+        self.for_course = for_course
+        self.prerequisite = prerequisite
+        self.strictness = strictness
+        self.save
 
 class Classroom(models.Model):
     building = models.CharField(max_length=30)
     class_name = models.CharField(max_length=10)
+
+    def fill(self, building, class_name):
+        self.building = building
+        self.class_name = class_name
+        self.save()
+
 
 
 class ClassSession(models.Model):
@@ -115,6 +156,14 @@ class ClassSession(models.Model):
     location = models.ForeignKey('Classroom', on_delete=models.SET_NULL, null=True)
 
     def make_custom_session(self, course, day_of_week, start_time, end_time, location):
+        self.course_session = course
+        self.day_of_week = day_of_week
+        self.start_time = start_time
+        self.end_time = end_time
+        self.location = location
+        self.save()
+
+    def fill(self, course, day_of_week, start_time, end_time, location):
         self.course_session = course
         self.day_of_week = day_of_week
         self.start_time = start_time
@@ -140,6 +189,14 @@ class Schedule(models.Model):
 
     def make_default(self):
         self.is_default = True
+        self.save()
+
+    def fill(self, user, name, classes, status, is_default):
+        self.user = user
+        self.name = name
+        self.classes = classes
+        self.status = status
+        self.is_default = is_default
         self.save()
 
 
@@ -175,4 +232,20 @@ class CommentOnProfessors(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.is_deleted = True
+        self.save()
+
+    def fill(self, user, course, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
+                        exam_difficulty_rate, date, is_anonymous, is_deleted):
+        self.user = user
+        self.course = course
+        self.professor = professor
+        self.text = text
+        self.rate = rate
+        self.knowledge_rate = knowledge_rate
+        self.teaching_rate = teaching_rate
+        self.communication_rate = communication_rate
+        self.exam_difficulty_rate = exam_difficulty_rate
+        self.date = date
+        self.is_anonymous = is_anonymous
+        self.is_deleted = is_deleted
         self.save()

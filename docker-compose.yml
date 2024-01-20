@@ -6,6 +6,17 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
 
   backend:
     build: .
@@ -19,6 +30,17 @@ services:
       - DATABASE_NAME=postgres
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres_password
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
 
   db:
     image: postgres

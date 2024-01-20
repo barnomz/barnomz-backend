@@ -17,6 +17,12 @@ services:
         limits:
           cpus: '0.50'
           memory: 500M
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 15s
 
   backend:
     build: .
@@ -41,6 +47,12 @@ services:
         limits:
           cpus: '0.50'
           memory: 500M
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8000/admin" ]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 15s
 
   db:
     image: postgres

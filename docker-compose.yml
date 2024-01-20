@@ -3,7 +3,9 @@ services:
   frontend:
     build: ../barnomz-frontend
     ports:
-      - "3000:3000"
+      - target: 3000
+        published: 3000
+        mode: ingress
     depends_on:
       - backend
     deploy:
@@ -28,7 +30,9 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     ports:
-      - "8000:8000"
+      - target: 8000
+        published: 8000
+        mode: ingress
     depends_on:
       - db
     environment:

@@ -6,9 +6,9 @@ from barnomz_app.models import *
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id', 'course_name', 'course_code', 'unit_count', 'offered_by', 'group', 'day_of_week', 'start_time',
-                  'end_time', 'final_exam_date', 'number_of_petitioners', 'number_of_capacity',
-                  'number_of_enrolled', 'professor', 'session', 'department', 'prerequisite']
+        fields = ['id', 'course_name', 'course_code', 'unit_count', 'presented_by', 'group',
+                  'final_exam_date', 'final_exam_time', 'number_of_petitioners', 'number_of_capacity',
+                  'number_of_enrolled', 'session', 'department', 'prerequisite_text', 'warning', 'grade', 'info']
 
 
 class ClassSessionSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ClassSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassSession
-        fields = ['id', 'course_details', 'day_of_week', 'start_time', 'end_time']
+        fields = ['id', 'course_session', 'day_of_week', 'start_time', 'end_time', 'location']
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'username', 'password', 'student_number']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'code']
 
 
 class ProfessorSerializer(serializers.ModelSerializer):
@@ -69,4 +69,4 @@ class ProfessorSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentOnProfessors
-        exclude = ['is_deleted']
+        exclude = ['is_deleted', 'text', 'professor', 'date', 'is_anonymous']

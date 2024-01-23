@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
 from .forms import RegisterForm
-from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors
+from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
     ProfessorSerializer, CommentSerializer
 from rest_framework.authtoken.models import Token
@@ -222,3 +222,40 @@ class RemoveComment(APIView):
         comment.is_deleted = True
         comment.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+def like_comment(request, comment_id):
+    try:
+        comment = CommentOnProfessors.objects.get(id=comment_id)
+        # Check if the user has already liked/disliked this comment
+        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+        if existing_like:
+            if existing_like.like:
+                return Response({'message': 'You have already liked this comment.'}, status=status.HTTP_400_BAD_REQUEST)
+            existing_like.like = True
+            existing_like.save()
+            return Response({'message': 'Your dislike has been changed to a like.'})
+        else:
+            CommentLike.objects.create(user=request.user, comment=comment, like=True)
+            return Response({'message': 'You liked the comment.'})
+    except CommentOnProfessors.DoesNotExist:
+        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def dislike_comment(request, comment_id):
+    try:
+        comment = CommentOnProfessors.objects.get(id=comment_id)
+        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+        if existing_like:
+            if not existing_like.like:
+                return Response({'message': 'You have already liked this comment.'}, status=status.HTTP_400_BAD_REQUEST)
+            existing_like.like = False
+            existing_like.save()
+            return Response({'message': 'Your dislike has been changed to a like.'})
+        else:
+            CommentLike.objects.create(user=request.user, comment=comment, like=True)
+            return Response({'message': 'You disliked the comment.'})
+    except CommentOnProfessors.DoesNotExist:
+        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)

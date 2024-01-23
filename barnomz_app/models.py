@@ -149,6 +149,12 @@ class CommentOnProfessors(models.Model):
     is_anonymous = models.BooleanField()
     is_deleted = models.BooleanField()
 
+    def count_likes(self):
+        return CommentLike.objects.filter(comment=self, like=True).count()
+
+    def count_dislikes(self):
+        return CommentLike.objects.filter(comment=self, like=False).count()
+
     def add_new_comment(self, user, course, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
                         exam_difficulty_rate, date, is_anonymous, is_deleted):
         self.user = user
@@ -168,3 +174,14 @@ class CommentOnProfessors(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.is_deleted = True
         self.save()
+
+
+class CommentLike(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    comment = models.ForeignKey('CommentOnProfessors', on_delete=models.CASCADE)
+    like = models.BooleanField()
+
+    class Meta:
+        unique_together = ('user', 'comment')
+
+

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
+from .forms import RegisterForm
 from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
     ProfessorSerializer, CommentSerializer
@@ -20,22 +21,14 @@ from rest_framework.authtoken.models import Token
 
 @api_view(['POST'])
 def register(request):
-    captcha_response = request.data.get('captcha_response')
-    secret_key = 'your_recaptcha_secret_key'
-    data = {
-        'secret': secret_key,
-        'response': captcha_response
-    }
-    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
-    result = r.json()
-    if not result.get('success'):
-        return Response({'captcha': 'Invalid Captcha'}, status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'POST':
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

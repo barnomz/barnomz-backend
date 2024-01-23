@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from barnomz_app.views import *
 
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
          name='get_all_reviews_about_lecturer'),
     path('comments/add/', AddComment.as_view(), name='add_comment'),
     path('comments/remove/<int:comment_id>/', RemoveComment.as_view(), name='remove_comment'),
+    path('captcha/', include('captcha.urls')),
 ]

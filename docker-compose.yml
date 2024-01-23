@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  frontend:
+    build: ../barnomz-frontend
+    ports:
+      - target: 3000
+        published: 3000
+        mode: ingress
+    depends_on:
+      - backend
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 15s
+
+  backend:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - target: 8000
+        published: 8000
+        mode: ingress
+    depends_on:
+      - db
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres_password
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8000/admin" ]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 15s
+
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data:

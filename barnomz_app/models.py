@@ -1,5 +1,6 @@
 from datetime import datetime, time
 
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 MAJOR_CHOICES = (
@@ -35,18 +36,9 @@ STRICTNESS_CHOICES = {
 }
 
 
-class User(models.Model):
-    username = models.CharField(max_length=255, unique=True)
+class User(AbstractUser):
     student_number = models.CharField(max_length=20, unique=True)
     major = models.CharField(max_length=100, choices=MAJOR_CHOICES)
-    password = models.CharField(max_length=32)
-
-    def create_user(self, username, student_number, major, password):
-        self.username = username
-        self.student_number = student_number
-        self.major = major
-        self.password = password
-        self.save()
 
     def edit_user(self, username, student_number, major, password):
         self.refresh_from_db()

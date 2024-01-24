@@ -41,6 +41,7 @@ class User(models.Model):
     student_number = models.CharField(max_length=20, unique=True)
     major = models.CharField(max_length=100, choices=MAJOR_CHOICES)
     password = models.CharField(max_length=32)
+    USERNAME_FIELD = 'username'
 
     def create_user(self, username, student_number, major, password):
         self.username = username

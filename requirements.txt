@@ -4,5 +4,4 @@ setuptools~=68.2.2
 Django~=4.2.7
 requests~=2.31.0
 djangorestframework~=3.14.0
-pillow~=10.2.0
-captcha~=0.5.0
+django-simple-captcha~=0.6.0

@@ -6,11 +6,9 @@ from barnomz_app.models import User
 
 
 class RegisterForm(UserCreationForm):
-    captcha = CaptchaField()
-
     class Meta:
         model = User
-        fields = ['username', 'password', 'student_number']
+        fields = ['username', 'student_number']
 
 
 class LoginForm(forms.Form):

@@ -1,7 +1,14 @@
+import uuid
 from datetime import datetime, time
+from importlib.resources import _
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
+from django.conf import settings
+from django.utils import timezone
 
 MAJOR_CHOICES = (
     ('CE', 'Computer Engineering'), ('CS', 'Computer Science'),
@@ -36,27 +43,59 @@ STRICTNESS_CHOICES = {
 }
 
 
-class User(models.Model):
+class UserManager(BaseUserManager):
+    def create_user(self, username, student_number, major, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The Username must be set')
+        user = self.model(username=username, student_number=student_number, major=major, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, student_number, major, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(username, student_number, major, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True)
     student_number = models.CharField(max_length=20, unique=True)
-    major = models.CharField(max_length=100, choices=MAJOR_CHOICES)
-    password = models.CharField(max_length=32)
+    major = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    last_login = models.DateTimeField(_('last login'), blank=True, null=True, default=timezone.now)
+
+    objects = UserManager()
+
     USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['student_number', 'major']
 
-    def create_user(self, username, student_number, major, password):
-        self.username = username
-        self.student_number = student_number
-        self.major = major
-        self.password = password
-        self.save()
+    def __str__(self):
+        return self.username
 
-    def edit_user(self, username, student_number, major, password):
-        self.refresh_from_db()
-        self.username = username
-        self.student_number = student_number
-        self.major = major
-        self.password = password
-        self.save()
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        blank=True,
+        help_text=_('The groups this user belongs to. A user will get all permissions granted to each of their groups.'),
+        related_name="%(app_label)s_%(class)s_related",
+        related_query_name="%(app_label)s_%(class)ss",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('user permissions'),
+        blank=True,
+        help_text=_('Specific permissions for this user.'),
+        related_name="%(app_label)s_%(class)s_related",
+        related_query_name="%(app_label)s_%(class)ss",
+    )
 
 
 class Department(models.Model):

@@ -19,6 +19,24 @@ class ClassSessionSerializer(serializers.ModelSerializer):
         fields = ['id', 'course_session', 'day_of_week', 'start_time', 'end_time', 'location']
 
 
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'student_number', 'major', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            student_number=validated_data['student_number'],
+            major=validated_data['major'],
+            password=validated_data['password']
+        )
+        return user
+
+
 class ScheduleSerializer(serializers.ModelSerializer):
     classes = ClassSessionSerializer(many=True, read_only=True)
 

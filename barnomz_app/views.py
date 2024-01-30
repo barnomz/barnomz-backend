@@ -1,16 +1,16 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as django_login, logout as django_logout, logout, login
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 from rest_framework.views import APIView
+from django.contrib.auth.hashers import check_password
 
 from .forms import RegisterForm, LoginForm
-from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike
+from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike, User
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
-    ProfessorSerializer, CommentSerializer
+    ProfessorSerializer, CommentSerializer, RegisterSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -18,38 +18,35 @@ from rest_framework.authtoken.models import Token
 # @authentication_classes([TokenAuthentication])
 # @permission_classes([IsAuthenticated])
 
+@api_view(['POST'])
+def signup(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
-def register(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+def login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    try:
+        user = User.objects.get(username=username)
+        if check_password(password, user.password):
+            login(request, user)
+            return Response({"message": "Successfully logged in."}, status=status.HTTP_200_OK)
         else:
-            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    except User.DoesNotExist:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
-def login(request):
-    form = LoginForm(request.POST)
-
-    if form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout(request):
-    request.auth.delete()
-    return Response(status=status.HTTP_200_OK)
+def logout_view(request):
+    logout(request)
+    return Response({"message": "Successfully logged out."})
 
 
 class ScheduleList(APIView):

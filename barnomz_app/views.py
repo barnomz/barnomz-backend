@@ -1,12 +1,13 @@
+from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
+
 from rest_framework.views import APIView
 
-from .forms import RegisterForm
+from .forms import RegisterForm, LoginForm
 from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
     ProfessorSerializer, CommentSerializer
@@ -32,12 +33,15 @@ def register(request):
 
 @api_view(['POST'])
 def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(username=username, password=password)
-    if user:
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
+    form = LoginForm(request.POST)
+
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request, username=username, password=password)
+        if user:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 

@@ -56,6 +56,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # other backends...
+]
+
 ROOT_URLCONF = "barnomz.urls"
 
 TEMPLATES = [

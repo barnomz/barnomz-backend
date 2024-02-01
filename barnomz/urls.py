@@ -4,7 +4,7 @@ from django.urls import path, include
 from barnomz_app.views import ScheduleList, add_schedule, remove_schedule, \
     add_course_to_schedule, remove_course_from_schedule, make_schedule_public, duplicate_schedule, GetAllDepartments, \
     GetCoursesOfDepartment, FilterPublicSchedules, GetLecturerInfo, GetAllReviewsAboutLecturer, AddComment, \
-    RemoveComment, like_comment, dislike_comment, signup, login_view, logout_view
+    RemoveComment, like_comment, dislike_comment, signup, login_view, logout_view, filling_data
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -28,5 +28,6 @@ urlpatterns = [
     path('api/comments/remove/<int:comment_id>/', RemoveComment.as_view(), name='remove_comment'),
     path('captcha/', include('captcha.urls')),
     path('comments/<int:comment_id>/like/', like_comment, name='like_comment'),
-    path('comments/<int:comment_id>/dislike/', dislike_comment, name='dislike_comment')
+    path('comments/<int:comment_id>/dislike/', dislike_comment, name='dislike_comment'),
+    path('api/filling_data/', filling_data,name='filling_data')
 ]

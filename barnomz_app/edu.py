@@ -2,15 +2,16 @@ import gnupg
 import requests
 import subprocess as sp
 from bs4 import BeautifulSoup
-from .models import *
 import datetime as dt
+
+from .models import Department, Professor, Course, Classroom
 from .session_parser import SessionParser
 from .location_parser import parse_location, parse_exam_time
 
 # the username and password used
 # to log into edu.sharif.edu
-_username = None
-_password = None
+_username = "99102412"
+_password = "0024628484"
 
 # pgp secret key fingerprint and password
 # to decrypt the credentials
@@ -172,7 +173,7 @@ def reset_edu_data():
     # fist remove all of the necessary data
     # from the database by running external
     # sql queries TODO: add the script
-    shell_clear_tables('script-name.sh')
+    # shell_clear_tables('script-name.sh')
 
     # then insert the new data
 

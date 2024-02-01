@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import check_password
 
+from .edu import reset_edu_data
 from .forms import RegisterForm, LoginForm
 from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike, User
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
@@ -258,4 +259,13 @@ def dislike_comment(request, comment_id):
             CommentLike.objects.create(user=request.user, comment=comment, like=True)
             return Response({'message': 'You disliked the comment.'})
     except CommentOnProfessors.DoesNotExist:
+        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def filling_data(request):
+    try:
+        reset_edu_data()
+        return Response({'message': 'SUCCESS.'})
+    except:
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)

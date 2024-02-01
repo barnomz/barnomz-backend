@@ -19,7 +19,8 @@ urlpatterns = [
     path('api/schedules/<int:schedule_id>/makePublic', make_schedule_public, name='make_schedule_public'),
     path('api/schedules/<int:schedule_id>/duplicate', duplicate_schedule, name='duplicate_schedule'),
     path('api/departments', GetAllDepartments.as_view(), name='get_all_departments'),
-    path('api/departments/<int:department_id>/courses', GetCoursesOfDepartment.as_view(), name='get_courses_of_department'),
+    path('api/departments/<int:department_id>/courses', GetCoursesOfDepartment.as_view(),
+         name='get_courses_of_department'),
     path('api/schedules/public', FilterPublicSchedules.as_view(), name='filter_public_schedules'),
     path('api/lecturers/<int:lecturer_id>', GetLecturerInfo.as_view(), name='get_lecturer_info'),
     path('api/lecturers/<int:lecturer_id>/reviews', GetAllReviewsAboutLecturer.as_view(),
@@ -29,5 +30,5 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('comments/<int:comment_id>/like/', like_comment, name='like_comment'),
     path('comments/<int:comment_id>/dislike/', dislike_comment, name='dislike_comment'),
-    path('api/filling_data/', filling_data,name='filling_data')
+    path('api/filling_data/', filling_data, name='filling_data')
 ]

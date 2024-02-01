@@ -268,4 +268,4 @@ def filling_data(request):
         reset_edu_data()
         return Response({'message': 'SUCCESS.'})
     except:
-        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'message': 'Failed.'}, status=status.HTTP_404_NOT_FOUND)

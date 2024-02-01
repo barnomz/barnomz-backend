@@ -10,8 +10,8 @@ from .location_parser import parse_location, parse_exam_time
 
 # the username and password used
 # to log into edu.sharif.edu
-_username = "99102412"
-_password = "0024628484"
+_username = None
+_password = None
 
 # pgp secret key fingerprint and password
 # to decrypt the credentials

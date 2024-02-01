@@ -266,6 +266,7 @@ def dislike_comment(request, comment_id):
 def filling_data(request):
     try:
         reset_edu_data()
+        print("salam")
         return Response({'message': 'SUCCESS.'})
     except:
         return Response({'message': 'Failed.'}, status=status.HTTP_404_NOT_FOUND)

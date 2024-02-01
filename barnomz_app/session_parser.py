@@ -1,7 +1,8 @@
 import re
 
+
 class SessionParser:
-    terminals=['شنبه', 'یکشنبه', 'دوشنبه', 'سه-شنبه', 'چهارشنبه', 'پنجشنبه']
+    terminals = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه-شنبه', 'چهارشنبه', 'پنجشنبه']
 
     def __init__(self):
         self.objects = []
@@ -15,7 +16,7 @@ class SessionParser:
 
     def get_token(self):
         return self.tokens[self.token_index]
-    
+
     def next_token(self):
         self.token_index += 1
         return self.tokens[self.token_index]
@@ -29,13 +30,13 @@ class SessionParser:
 
     def step_S(self):
         token = self.get_token()
-        if(token == '$'):
+        if (token == '$'):
             return
 
         if not token in SessionParser.terminals:
             print(f"concern in step_S: not in first set ({token})")
-            return 
-        
+            return
+
         self.step_P()
         self.step_N()
 
@@ -43,52 +44,51 @@ class SessionParser:
         token = self.get_token()
         if not token in SessionParser.terminals:
             print(f"concern in step_P: not in first set ({token})")
-            return 
-        
+            return
+
         d = token
         token = self.next_token()
-        if(token != 'از'):
+        if token != 'از':
             print("concern: no از")
             return
 
         token = self.next_token()
-        if(token != 'ساعت'):
+        if token != 'ساعت':
             print("concern: no ساعت")
             return
-        
+
         token = self.next_token()
-        if SessionParser.assert_time(token) == False :
+        if SessionParser.assert_time(token) == False:
             print(f"concern in step_P: not a time ({token})")
             return
         s = token
-        
+
         token = self.next_token()
-        if(token != 'تا'):
+        if (token != 'تا'):
             print("concern: no تا")
             return
 
         token = self.next_token()
-        if SessionParser.assert_time(token) == False :
+        if not SessionParser.assert_time(token):
             print(f"concern in step_P: not a time ({token})")
             return
         e = token
 
-        self.next_token() # move forward since we captured the token
+        self.next_token()  # move forward since we captured the token
 
-        self.objects.append((d,s,e))
+        self.objects.append((d, s, e))
 
     def step_N(self):
         token = self.get_token()
         if token != 'و' and token != '$':
             print(f"concern in step_N: not in first or follow ({token})")
             return
-        if(token == 'و'):
-            self.next_token() # capture the و
+        if token == 'و':
+            self.next_token()  # capture the و
             self.step_P()
             self.step_N()
-        else: #if token == '$':
+        else:  # if token == '$':
             return
-
 
     def fix(string):
         new_arr = []
@@ -97,8 +97,8 @@ class SessionParser:
         while i < len(arr):
             token = arr[i]
             matches = re.match("(([0-9]{1,2}:)?[0-9]{1,2})و(.*)$", token)
-            if matches == None:
-                if(token == 'صه'):
+            if matches is None:
+                if (token == 'صه'):
                     new_arr.append('سه-شنبه')
                     i += 2
                 else:
@@ -114,7 +114,7 @@ class SessionParser:
                 i += 2
             else:
                 new_arr.append(other)
-                i=i+1
+                i = i + 1
         return ' '.join(new_arr)
 
     def assert_time(token):
@@ -124,7 +124,8 @@ class SessionParser:
         return True
 
 
-string = 'یکشنبه از ساعت 15 تا 16:30وسه شنبه از ساعت 15 تا 16:30وپنجشنبه از ساعت 10:30 تا 12وپنجشنبه از ساعت 15 تا 16:30'
+string = 'یکشنبه از ساعت 15 تا 16:30وسه شنبه از ساعت 15 تا 16:30وپنجشنبه از ساعت 10:30 تا 12وپنجشنبه از ساعت 15 تا ' \
+         '16:30 '
 parser = SessionParser()
 parser.parse(string)
 print(parser.objects)

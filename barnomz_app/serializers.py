@@ -22,7 +22,7 @@ class ClassSessionSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'student_number', 'major', 'password']
+        fields = ['username', 'student_number', 'password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -31,7 +31,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             student_number=validated_data['student_number'],
-            major=validated_data['major'],
             password=validated_data['password']
         )
         return user

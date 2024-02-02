@@ -68,9 +68,9 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True)
     student_number = models.CharField(max_length=20, unique=True)
-    major = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    major = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True, blank=True, null=True)
+    is_staff = models.BooleanField(default=False, blank=True, null=True)
     last_login = models.DateTimeField(_('last login'), blank=True, null=True, default=timezone.now)
 
     objects = UserManager()

@@ -45,7 +45,7 @@ STRICTNESS_CHOICES = {
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, student_number, major, password=None, **extra_fields):
+    def create_user(self, username, student_number, password=None, **extra_fields):
         if not username:
             raise ValueError('The Username must be set')
         user = self.model(username=username, student_number=student_number, **extra_fields)

@@ -37,7 +37,7 @@ def login_view(request):
     if user is not None:
         login(request, user)
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "message": "Successfully logged in."}, status=status.HTTP_200_OK)
+        return Response({"message": "Successfully logged in.", "data": {"token": token.key}}, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 

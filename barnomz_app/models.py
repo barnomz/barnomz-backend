@@ -44,39 +44,19 @@ STRICTNESS_CHOICES = {
 }
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, username, student_number, password=None, **extra_fields):
-        if not username:
-            raise ValueError('The Username must be set')
-        user = self.model(username=username, student_number=student_number, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, username, student_number, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self.create_user(username, student_number, password, **extra_fields)
-
-
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractUser, PermissionsMixin):
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
     username = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, null=True, blank=True)
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     student_number = models.CharField(max_length=20, unique=True)
     major = models.CharField(max_length=100, blank=True, null=True)
     is_active = models.BooleanField(default=True, blank=True, null=True)
     is_staff = models.BooleanField(default=False, blank=True, null=True)
     last_login = models.DateTimeField(_('last login'), blank=True, null=True, default=timezone.now)
 
-    objects = UserManager()
-
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['student_number']
 
     def __str__(self):
         return self.username

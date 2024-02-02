@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout, logout, login
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -32,18 +33,16 @@ def signup(request):
 def login_view(request):
     username = request.data.get('username')
     password = request.data.get('password')
-
-    try:
-        user = User.objects.get(username=username)
-        if check_password(password, user.password):
-            login(request, user)
-            return Response({"message": "Successfully logged in."}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-    except User.DoesNotExist:
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key, "message": "Successfully logged in."}, status=status.HTTP_200_OK)
+    else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def logout_view(request):
     logout(request)

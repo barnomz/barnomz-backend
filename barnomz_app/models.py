@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime, time
-from importlib.resources import _
+import gettext
 
+gettext.install('barnomz', localedir=None, codeset=None)
+_ = gettext.gettext
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
 
 from django.conf import settings
 from django.utils import timezone
@@ -47,12 +48,12 @@ class UserManager(BaseUserManager):
     def create_user(self, username, student_number, major, password=None, **extra_fields):
         if not username:
             raise ValueError('The Username must be set')
-        user = self.model(username=username, student_number=student_number, major=major, **extra_fields)
+        user = self.model(username=username, student_number=student_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, student_number, major, password=None, **extra_fields):
+    def create_superuser(self, username, student_number, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -61,7 +62,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(username, student_number, major, password, **extra_fields)
+        return self.create_user(username, student_number, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -84,7 +85,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         Group,
         verbose_name=_('groups'),
         blank=True,
-        help_text=_('The groups this user belongs to. A user will get all permissions granted to each of their groups.'),
+        help_text=_(
+            'The groups this user belongs to. A user will get all permissions granted to each of their groups.'),
         related_name="%(app_label)s_%(class)s_related",
         related_query_name="%(app_label)s_%(class)ss",
     )

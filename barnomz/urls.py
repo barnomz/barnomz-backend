@@ -8,9 +8,9 @@ from barnomz_app.views import ScheduleList, add_schedule, remove_schedule, \
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('signup/', signup, name='signup'),
-    path('login/', login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
+    path('api/auth/register/', signup, name='signup'),
+    path('api/auth/login/', login_view, name='login'),
+    path('api/auth/logout/', logout_view, name='logout'),
     path('api/schedules/', ScheduleList.as_view(), name='schedule_list'),
     path('api/schedules/', add_schedule, name='add_schedule'),
     path('api/schedules/<int:schedule_id>/', remove_schedule, name='remove_schedule'),

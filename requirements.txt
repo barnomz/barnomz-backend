@@ -5,3 +5,5 @@ Django~=4.2.7
 requests~=2.31.0
 djangorestframework~=3.14.0
 django-simple-captcha~=0.6.0
+gnupg~=2.3.1
+beautifulsoup4~=4.12.3

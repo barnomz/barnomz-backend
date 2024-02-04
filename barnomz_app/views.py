@@ -181,6 +181,7 @@ class GetLecturersInfo(APIView):
         })
 
 
+@api_view(['POST'])
 def getLecturerInfo(request, lecturer_id):
     lecturer = Professor.objects.get(pk=lecturer_id)
     serializer = LecturerSerializer(lecturer)

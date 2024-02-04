@@ -37,11 +37,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    classes = ClassSessionSerializer(many=True, read_only=True)
+    classes = serializers.PrimaryKeyRelatedField(queryset=ClassSession.objects.all(), many=True, required=False)
 
     class Meta:
         model = Schedule
-        fields = ['id', 'name', 'classes', 'status', 'is_default']
+        fields = ['id', 'classes', 'status']
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -207,29 +207,18 @@ class ClassSession(models.Model):
 
 class Schedule(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    classes = models.ManyToManyField('ClassSession')
-    status = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')])
-    is_default = models.BooleanField()
+    classes = models.ManyToManyField('ClassSession', null=True, blank=True)
+    status = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')], default='private')
 
-    def add_new_schedule(self, user, name, classes, status, is_default):
+    def add_new_schedule(self, user):
         self.user = user
-        self.name = name
-        self.classes = classes
-        self.status = status
-        self.is_default = is_default
+        self.classes = []
         self.save()
 
-    def make_default(self):
-        self.is_default = True
-        self.save()
-
-    def fill(self, user, name, classes, status, is_default):
+    def fill(self, user, classes, status):
         self.user = user
-        self.name = name
         self.classes = classes
         self.status = status
-        self.is_default = is_default
         self.save()
 
 

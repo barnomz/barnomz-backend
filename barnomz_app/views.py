@@ -50,6 +50,8 @@ def logout_view(request):
 
 
 class ScheduleList(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         user_id = request.user.id
         schedules = Schedule.objects.filter(user=user_id)
@@ -60,11 +62,16 @@ class ScheduleList(APIView):
             "data": serializer.data
         })
 
-    def post(self, request, format=None):
-        serializer = ScheduleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_schedule(request):
+    serializer = ScheduleSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response({"status": "success", "message": "Schedule added successfully.", "data": serializer.data},
+                        status=status.HTTP_201_CREATED)
+    else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -229,7 +236,8 @@ def like_comment(request, comment_id):
         existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
         if existing_like:
             if existing_like.like:
-                return Response({'message': 'You have already liked this comment.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'You have already liked this comment.'},
+                                status=status.HTTP_400_BAD_REQUEST)
             existing_like.like = True
             existing_like.save()
             return Response({'message': 'Your dislike has been changed to a like.'})
@@ -247,7 +255,8 @@ def dislike_comment(request, comment_id):
         existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
         if existing_like:
             if not existing_like.like:
-                return Response({'message': 'You have already liked this comment.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'You have already liked this comment.'},
+                                status=status.HTTP_400_BAD_REQUEST)
             existing_like.like = False
             existing_like.save()
             return Response({'message': 'Your dislike has been changed to a like.'})

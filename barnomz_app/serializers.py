@@ -8,7 +8,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = ['id', 'course_name', 'course_code', 'unit_count', 'presented_by', 'group',
                   'final_exam_date', 'final_exam_time', 'number_of_petitioners', 'number_of_capacity',
-                  'number_of_enrolled', 'session', 'department', 'prerequisite_text', 'warning', 'grade', 'info']
+                  'number_of_enrolled', 'location', 'department', 'warning', 'grade', 'info']
 
 
 class ClassSessionSerializer(serializers.ModelSerializer):

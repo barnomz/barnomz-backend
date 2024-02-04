@@ -17,11 +17,35 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class ClassSessionSerializer(serializers.ModelSerializer):
-    course_details = CourseSerializer(source='course', read_only=True)
-
     class Meta:
         model = ClassSession
-        fields = ['id', 'course_session', 'day_of_week', 'start_time', 'end_time', 'location']
+        fields = ['id', 'day_of_week', 'start_time', 'end_time', 'location']
+
+
+class ClassSessionAllDataSerializer(ClassSessionSerializer):
+    course_name = serializers.SerializerMethodField()
+    course_code = serializers.SerializerMethodField()
+    presented_by = serializers.SerializerMethodField()
+    group = serializers.SerializerMethodField()
+
+    class Meta(ClassSessionSerializer.Meta):
+        fields = ClassSessionSerializer.Meta.fields + ['course_name', 'course_code', 'presented_by', 'group']
+
+    @staticmethod
+    def get_course_name(obj):
+        return obj.course_session.course_name
+
+    @staticmethod
+    def get_course_code(obj):
+        return obj.course_session.course_code
+
+    @staticmethod
+    def get_presented_by(obj):
+        return obj.course_session.presented_by.full_name if obj.course_session.presented_by else None
+
+    @staticmethod
+    def get_group(obj):
+        return obj.course_session.group
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -42,11 +66,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    classes = serializers.PrimaryKeyRelatedField(queryset=ClassSession.objects.all(), many=True, required=False)
+    classes = serializers.SerializerMethodField()
 
     class Meta:
         model = Schedule
         fields = ['id', 'classes', 'status']
+
+    def get_classes(self, obj):
+        class_sessions = obj.classes.all()
+        return ClassSessionAllDataSerializer(class_sessions, many=True, context=self.context).data
 
 
 class UserSerializer(serializers.ModelSerializer):

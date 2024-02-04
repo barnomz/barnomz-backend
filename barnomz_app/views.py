@@ -95,8 +95,7 @@ def add_course_to_schedule(request, schedule_id):
         course = ClassSession.objects.get(pk=course_data['id'])
         schedule.classes.add(course)
         schedule.save()
-        all_schedules = Schedule.objects.filter(user=request.user)
-        serializer = ScheduleSerializer(all_schedules, many=True)
+        serializer = ScheduleSerializer(schedule)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except (Schedule.DoesNotExist, ClassSession.DoesNotExist):
         return Response(status=status.HTTP_404_NOT_FOUND)

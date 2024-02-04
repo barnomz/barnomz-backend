@@ -29,7 +29,6 @@ urlpatterns = [
          name='get_all_reviews_about_lecturer'),
     path('api/comments/add/', AddComment.as_view(), name='add_comment'),
     path('api/comments/remove/<int:comment_id>/', RemoveComment.as_view(), name='remove_comment'),
-    path('captcha/', include('captcha.urls')),
     path('comments/<int:comment_id>/like/', like_comment, name='like_comment'),
     path('comments/<int:comment_id>/dislike/', dislike_comment, name='dislike_comment'),
     path('api/filling_data/', filling_data, name='filling_data')

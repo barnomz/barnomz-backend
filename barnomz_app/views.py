@@ -266,11 +266,11 @@ def dislike_comment(request, comment_id):
         existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
         if existing_like:
             if not existing_like.like:
-                return Response({'message': 'You have already liked this comment.'},
+                return Response({'message': 'You have already disliked this comment.'},
                                 status=status.HTTP_400_BAD_REQUEST)
             existing_like.like = False
             existing_like.save()
-            return Response({'message': 'Your dislike has been changed to a like.'})
+            return Response({'message': 'Your like has been changed to a dislike.'})
         else:
             CommentLike.objects.create(user=request.user, comment=comment, like=True)
             return Response({'message': 'You disliked the comment.'})

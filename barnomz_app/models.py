@@ -207,7 +207,7 @@ class ClassSession(models.Model):
 
 class Schedule(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    classes = models.ManyToManyField('ClassSession', null=True, blank=True)
+    classes = models.ManyToManyField('ClassSession', blank=True)
     status = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')], default='private')
 
     def add_new_schedule(self, user):
@@ -223,18 +223,15 @@ class Schedule(models.Model):
 
 
 class CommentOnProfessors(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
     professor = models.ForeignKey('Professor', on_delete=models.CASCADE)
     text = models.TextField()
-    rate = models.FloatField()
-    knowledge_rate = models.FloatField()
-    teaching_rate = models.FloatField()
-    communication_rate = models.FloatField()
-    exam_difficulty_rate = models.FloatField()
-    date = models.DateTimeField()
-    is_anonymous = models.BooleanField()
-    is_deleted = models.BooleanField()
+    rate = models.FloatField(null=True, blank=True)
+    knowledge_rate = models.FloatField(null=True, blank=True)
+    teaching_rate = models.FloatField(null=True, blank=True)
+    communication_rate = models.FloatField(null=True, blank=True)
+    exam_difficulty_rate = models.FloatField(null=True, blank=True)
+    is_anonymous = models.BooleanField(default=True,null=True)
+    is_deleted = models.BooleanField(default=False, null=True)
 
     def count_likes(self):
         return CommentLike.objects.filter(comment=self, like=True).count()
@@ -242,10 +239,8 @@ class CommentOnProfessors(models.Model):
     def count_dislikes(self):
         return CommentLike.objects.filter(comment=self, like=False).count()
 
-    def add_new_comment(self, user, course, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
-                        exam_difficulty_rate, date, is_anonymous, is_deleted):
-        self.user = user
-        self.course = course
+    def add_new_comment(self, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
+                        exam_difficulty_rate, is_anonymous, is_deleted):
         self.professor = professor
         self.text = text
         self.rate = rate
@@ -253,7 +248,6 @@ class CommentOnProfessors(models.Model):
         self.teaching_rate = teaching_rate
         self.communication_rate = communication_rate
         self.exam_difficulty_rate = exam_difficulty_rate
-        self.date = date
         self.is_anonymous = is_anonymous
         self.is_deleted = is_deleted
         self.save()
@@ -262,10 +256,8 @@ class CommentOnProfessors(models.Model):
         self.is_deleted = True
         self.save()
 
-    def fill(self, user, course, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
-             exam_difficulty_rate, date, is_anonymous, is_deleted):
-        self.user = user
-        self.course = course
+    def fill(self, professor, text, rate, knowledge_rate, teaching_rate, communication_rate,
+             exam_difficulty_rate, is_anonymous, is_deleted):
         self.professor = professor
         self.text = text
         self.rate = rate
@@ -273,7 +265,6 @@ class CommentOnProfessors(models.Model):
         self.teaching_rate = teaching_rate
         self.communication_rate = communication_rate
         self.exam_difficulty_rate = exam_difficulty_rate
-        self.date = date
         self.is_anonymous = is_anonymous
         self.is_deleted = is_deleted
         self.save()

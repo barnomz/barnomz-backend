@@ -61,17 +61,31 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class ProfessorSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
     department = serializers.CharField(source='department.name')
+
+    class Meta:
+        model = Professor
+        fields = ['id', 'full_name', 'department']
+
+    @staticmethod
+    def get_name(obj):
+        return f"{obj.full_name}"
+
+    @staticmethod
+    def get_rate(obj):
+        return {
+            "teachQuality": obj.teaching_rate,
+            "scoring": obj.exam_difficulty_rate,
+            "morality": obj.communication_rate
+        }
+
+
+class LecturerSerializer(ProfessorSerializer):
     rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Professor
-        fields = ['id', 'full_name', 'college', 'number_of_votes', 'rate']
-
-    @staticmethod
-    def get_name(obj):
-        return f"Dr. {obj.full_name}"
+        fields = (ProfessorSerializer.Meta.fields + ['number_of_votes', 'rate'])
 
     @staticmethod
     def get_rate(obj):

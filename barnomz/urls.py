@@ -3,8 +3,9 @@ from django.urls import path, include
 
 from barnomz_app.views import ScheduleList, remove_schedule, \
     add_course_to_schedule, remove_course_from_schedule, make_schedule_public, duplicate_schedule, GetAllDepartments, \
-    GetCoursesOfDepartment, FilterPublicSchedules, GetLecturerInfo, GetAllReviewsAboutLecturer, AddComment, \
-    RemoveComment, like_comment, dislike_comment, signup, login_view, logout_view, filling_data, add_schedule
+    GetCoursesOfDepartment, FilterPublicSchedules, GetLecturersInfo, GetAllReviewsAboutLecturer, AddComment, \
+    RemoveComment, like_comment, dislike_comment, signup, login_view, logout_view, filling_data, add_schedule, \
+    getLecturerInfo
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -22,7 +23,8 @@ urlpatterns = [
     path('api/departments/<int:department_id>/courses', GetCoursesOfDepartment.as_view(),
          name='get_courses_of_department'),
     path('api/schedules/public/', FilterPublicSchedules.as_view(), name='filter_public_schedules'),
-    path('api/lecturers/<int:lecturer_id>/', GetLecturerInfo.as_view(), name='get_lecturer_info'),
+    path('api/lecturers/', GetLecturersInfo.as_view(), name='get_all_lecturers_info'),
+    path('api/lecturers/<int:lecturer_id>/', getLecturerInfo, name='get_lecturer_info'),
     path('api/lecturers/<int:lecturer_id>/reviews/', GetAllReviewsAboutLecturer.as_view(),
          name='get_all_reviews_about_lecturer'),
     path('api/comments/add/', AddComment.as_view(), name='add_comment'),

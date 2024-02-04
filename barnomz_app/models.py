@@ -91,7 +91,7 @@ class Department(models.Model):
 
 
 class Professor(models.Model):
-    full_name = models.CharField(max_length=255, primary_key=True)
+    full_name = models.CharField(max_length=255)
     department = models.ForeignKey('Department', on_delete=models.CASCADE)
     rate = models.FloatField()
     knowledge_rate = models.FloatField()
@@ -114,7 +114,7 @@ class Professor(models.Model):
 
 class Course(models.Model):
     course_name = models.CharField(max_length=255)
-    course_code = models.CharField(max_length=20, unique=True, primary_key=True)
+    course_code = models.CharField(max_length=20, unique=True)
     unit_count = models.PositiveIntegerField()
     presented_by = models.ForeignKey('Professor', on_delete=models.CASCADE)
     group = models.PositiveIntegerField()

@@ -12,7 +12,7 @@ from .edu import reset_edu_data
 from .forms import RegisterForm, LoginForm
 from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike, User
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
-    ProfessorSerializer, CommentSerializer, RegisterSerializer
+    ProfessorSerializer, CommentSerializer, RegisterSerializer, LecturerSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -170,15 +170,25 @@ class GetCoursesOfDepartment(APIView):
         })
 
 
-class GetLecturerInfo(APIView):
-    def get(self, request, lecturer_id, format=None):
-        lecturer = Professor.objects.get(pk=lecturer_id)
-        serializer = ProfessorSerializer(lecturer)
+class GetLecturersInfo(APIView):
+    def get(self, request, format=None):
+        lecturer = Professor.objects.all()
+        serializer = ProfessorSerializer(lecturer, many=True)
         return Response({
             "status": "success",
-            "message": "Lecturer info retrieved successfully.",
+            "message": "Lecturers info retrieved successfully.",
             "data": serializer.data
         })
+
+
+def getLecturerInfo(request, lecturer_id):
+    lecturer = Professor.objects.get(pk=lecturer_id)
+    serializer = LecturerSerializer(lecturer)
+    return Response({
+        "status": "success",
+        "message": "Lecturer info retrieved successfully.",
+        "data": serializer.data
+    })
 
 
 # Todo: make this specific and fixed

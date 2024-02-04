@@ -4,11 +4,16 @@ from barnomz_app.models import *
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    presented_by = serializers.CharField(max_length=255)
+
     class Meta:
         model = Course
         fields = ['id', 'course_name', 'course_code', 'unit_count', 'presented_by', 'group',
                   'final_exam_date', 'final_exam_time', 'number_of_petitioners', 'number_of_capacity',
                   'number_of_enrolled', 'location', 'department', 'warning', 'grade', 'info']
+
+    def get_presented_by(self):
+        return Professor.objects.get(self.presented_by).full_name
 
 
 class ClassSessionSerializer(serializers.ModelSerializer):
@@ -97,6 +102,8 @@ class LecturerSerializer(ProfessorSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    professor = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all())
+
     class Meta:
         model = CommentOnProfessors
-        exclude = ['is_deleted', 'text', 'professor', 'date', 'is_anonymous']
+        fields = '__all__'

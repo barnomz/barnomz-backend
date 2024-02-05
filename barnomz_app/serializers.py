@@ -222,7 +222,17 @@ class LecturerSerializer(ProfessorSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     professor = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all())
+    likes = serializers.SerializerMethodField()
+    dislikes = serializers.SerializerMethodField()
 
     class Meta:
         model = CommentOnProfessors
-        fields = '__all__'
+        fields = ['id', 'professor', 'text', 'likes', 'dislikes']
+
+    @staticmethod
+    def get_likes(obj):
+        return obj.count_likes()
+
+    @staticmethod
+    def get_dislikes(obj):
+        return obj.count_dislikes()

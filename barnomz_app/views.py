@@ -12,7 +12,7 @@ from .edu import reset_edu_data
 from .forms import RegisterForm, LoginForm
 from .models import Schedule, ClassSession, Department, Course, Professor, CommentOnProfessors, CommentLike, User
 from .serializers import UserSerializer, ScheduleSerializer, DepartmentSerializer, CourseSerializer, \
-    ProfessorSerializer, CommentSerializer, RegisterSerializer, LecturerSerializer
+    ProfessorSerializer, CommentSerializer, RegisterSerializer, LecturerSerializer, ClassSessionAllDataSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -160,8 +160,8 @@ class GetAllDepartments(APIView):
 
 class GetCoursesOfDepartment(APIView):
     def get(self, request, department_id, format=None):
-        courses = Course.objects.filter(department_id=department_id)
-        serializer = CourseSerializer(courses, many=True)
+        sessions = ClassSession.objects.filter(course_session__department_id=department_id)
+        serializer = ClassSessionAllDataSerializer(sessions, many=True)
         return Response({
             "status": "success",
             "message": "Courses retrieved successfully.",

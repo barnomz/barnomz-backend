@@ -254,63 +254,48 @@ class RemoveComment(APIView):
         comment.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 @api_view(['POST'])
 def like_comment(request, comment_id):
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            comment = CommentOnProfessors.objects.get(id=comment_id)
-            existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+    try:
+        comment = CommentOnProfessors.objects.get(id=comment_id)
+        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
 
-            if existing_like:
-                if existing_like.like:
-                    return Response({'message': 'You have already liked this comment.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-                existing_like.like = True
-            else:
-                existing_like = CommentLike.objects.create(user=request.user, comment=comment, like=True)
-                return Response({'message': 'Your like has been added.', 'data': serializer.data},
-                                status=status.HTTP_201_CREATED)
+        if existing_like:
+            if existing_like.like:
+                return Response({'message': 'You have already liked this comment.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            existing_like.like = True
+        else:
+            existing_like = CommentLike.objects.create(user=request.user, comment=comment, like=True)
 
-            existing_like.save()
-            comment_serializer = CommentSerializer(comment)
-            return Response({'message': 'Your like/dislike has been updated.', 'data': comment_serializer.data},
-                            status=status.HTTP_200_OK)
-        except CommentOnProfessors.DoesNotExist:
-            return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        existing_like.save()
+        comment_serializer = CommentSerializer(comment)
+        return Response({'message': 'Your like/dislike has been updated.', 'data': comment_serializer.data},
+                        status=status.HTTP_200_OK)
+    except CommentOnProfessors.DoesNotExist:
+        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
 def dislike_comment(request, comment_id):
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            comment = CommentOnProfessors.objects.get(id=comment_id)
-            existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+    try:
+        comment = CommentOnProfessors.objects.get(id=comment_id)
+        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
 
-            if existing_like:
-                if not existing_like.like:
-                    return Response({'message': 'You have already disliked this comment.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-                existing_like.like = False
-            else:
-                existing_like = CommentLike.objects.create(user=request.user, comment=comment, like=False)
-                return Response({'message': 'Your dislike has been added.', 'data': serializer.data},
-                                status=status.HTTP_201_CREATED)
+        if existing_like:
+            if not existing_like.like:
+                return Response({'message': 'You have already disliked this comment.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            existing_like.like = False
+        else:
+            existing_like = CommentLike.objects.create(user=request.user, comment=comment, like=False)
 
-            existing_like.save()
-
-            # Serialize the comment for response
-            comment_serializer = CommentSerializer(comment)
-            return Response({'message': 'Your like has been changed to a dislike.', 'data': comment_serializer.data},
-                            status=status.HTTP_200_OK)
-        except CommentOnProfessors.DoesNotExist:
-            return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        existing_like.save()
+        comment_serializer = CommentSerializer(comment)
+        return Response({'message': 'Your like has been changed to a dislike.', 'data': comment_serializer.data},
+                        status=status.HTTP_200_OK)
+    except CommentOnProfessors.DoesNotExist:
+        return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])

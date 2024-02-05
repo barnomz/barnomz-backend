@@ -17,9 +17,25 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class ClassSessionSerializer(serializers.ModelSerializer):
+    day_of_week = serializers.SerializerMethodField()
+
     class Meta:
         model = ClassSession
         fields = ['id', 'day_of_week', 'start_time', 'end_time', 'location']
+
+    def get_day_of_week(self, obj):
+        # Using the object instance to get the day_of_week attribute
+        day_name = obj.day_of_week
+        day_to_int = {
+            'شنبه': 0,
+            'یکشنبه': 1,
+            'دوشنبه': 2,
+            'سه-شنبه': 3,
+            'چهارشنبه': 4,
+            'پنجشنبه': 5,
+            'جمعه': 6,
+        }
+        return day_to_int.get(day_name, None)
 
 
 class ClassSessionAllDataSerializer(ClassSessionSerializer):

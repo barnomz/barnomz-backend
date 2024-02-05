@@ -257,6 +257,7 @@ class RemoveComment(APIView):
 @api_view(['POST'])
 def like_comment(request, comment_id):
     try:
+        serializer = CommentSerializer(data=request.data)
         comment = CommentOnProfessors.objects.get(id=comment_id)
         # Check if the user has already liked/disliked this comment
         existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
@@ -266,10 +267,11 @@ def like_comment(request, comment_id):
                                 status=status.HTTP_400_BAD_REQUEST)
             existing_like.like = True
             existing_like.save()
-            return Response({'message': 'Your dislike has been changed to a like.'})
+            return Response({'message': 'Your dislike has been changed to a like.', 'data': serializer.data},
+                            status=status.HTTP_200_OK)
         else:
             CommentLike.objects.create(user=request.user, comment=comment, like=True)
-            return Response({'message': 'You liked the comment.'})
+            return Response({'message': 'You liked the comment.', 'data': serializer.data}, status=status.HTTP_200_OK)
     except CommentOnProfessors.DoesNotExist:
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -277,6 +279,7 @@ def like_comment(request, comment_id):
 @api_view(['POST'])
 def dislike_comment(request, comment_id):
     try:
+        serializer = CommentSerializer(data=request.data)
         comment = CommentOnProfessors.objects.get(id=comment_id)
         existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
         if existing_like:
@@ -285,10 +288,10 @@ def dislike_comment(request, comment_id):
                                 status=status.HTTP_400_BAD_REQUEST)
             existing_like.like = False
             existing_like.save()
-            return Response({'message': 'Your like has been changed to a dislike.'})
+            return Response({'message': 'Your like has been changed to a dislike.', 'data': serializer.data})
         else:
             CommentLike.objects.create(user=request.user, comment=comment, like=True)
-            return Response({'message': 'You disliked the comment.'})
+            return Response({'message': 'You disliked the comment.', 'data': serializer.data})
     except CommentOnProfessors.DoesNotExist:
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 

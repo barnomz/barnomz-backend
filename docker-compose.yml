@@ -9,7 +9,7 @@ services:
     depends_on:
       - backend
     deploy:
-      replicas: 2
+      replicas: 1
       update_config:
         order: start-first
         delay: 10s
@@ -41,7 +41,7 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres_password
     deploy:
-      replicas: 2
+      replicas: 1
       update_config:
         order: start-first
         delay: 10s

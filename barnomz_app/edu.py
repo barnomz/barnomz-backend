@@ -107,7 +107,7 @@ def extract_data(soup):
         dep = table_meta.select_one('td:nth-of-type(5)').select_one('span').text
         for k in [3, 4]:
             row_cols = table_data.select(f"tr:nth-of-type({k})>td")
-            if (len(row_cols) < 4): continue
+            if len(row_cols) < 4: continue
             name = ""
             number = ""
             group = 0

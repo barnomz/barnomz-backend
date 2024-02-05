@@ -98,7 +98,7 @@ class SessionParser:
             token = arr[i]
             matches = re.match("(([0-9]{1,2}:)?[0-9]{1,2})و(.*)$", token)
             if matches is None:
-                if (token == 'صه'):
+                if token == 'صه':
                     new_arr.append('سه-شنبه')
                     i += 2
                 else:

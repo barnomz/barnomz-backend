@@ -284,18 +284,21 @@ def like_comment(request, comment_id):
 def dislike_comment(request, comment_id):
     try:
         serializer = CommentSerializer(data=request.data)
-        comment = CommentOnProfessors.objects.get(id=comment_id)
-        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
-        if existing_like:
-            if not existing_like.like:
-                return Response({'message': 'You have already disliked this comment.'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            existing_like.like = False
-            existing_like.save()
-            return Response({'message': 'Your like has been changed to a dislike.', 'data': serializer.data})
-        else:
-            CommentLike.objects.create(user=request.user, comment=comment, like=True)
-            return Response({'message': 'You disliked the comment.', 'data': serializer.data})
+        if serializer.is_valid():
+            comment = CommentOnProfessors.objects.get(id=comment_id)
+            existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+            if existing_like:
+                if not existing_like.like:
+                    return Response({'message': 'You have already disliked this comment.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                existing_like.like = False
+                existing_like.save()
+                serializer.save()
+                return Response({'message': 'Your like has been changed to a dislike.', 'data': serializer.data})
+            else:
+                CommentLike.objects.create(user=request.user, comment=comment, like=True)
+                serializer.save()
+                return Response({'message': 'You disliked the comment.', 'data': serializer.data})
     except CommentOnProfessors.DoesNotExist:
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 

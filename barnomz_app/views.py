@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout, logout, login
+from django.db.models import Count, Min
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -160,7 +161,22 @@ class GetAllDepartments(APIView):
 
 class GetCoursesOfDepartment(APIView):
     def get(self, request, department_id, format=None):
-        sessions = ClassSession.objects.filter(course_session__department_id=department_id)
+        duplicate_info = (ClassSession.objects
+                          .filter(course_session__department_id=department_id)
+                          .values('course_session')
+                          .annotate(min_id=Min('id'),
+                                    count_id=Count('id'))
+                          .filter(count_id__gt=1))
+        duplicate_sessions_ids = []
+        for item in duplicate_info:
+            duplicate_ids = (ClassSession.objects
+                             .filter(course_session=item['course_session'],
+                                     course_session__department_id=department_id)
+                             .exclude(id=item['min_id'])
+                             .values_list('id', flat=True))
+
+            duplicate_sessions_ids.extend(list(duplicate_ids))
+        sessions = ClassSession.objects.filter(id__in=duplicate_sessions_ids)
         serializer = ClassSessionAllDataSerializer(sessions, many=True)
         return Response({
             "status": "success",

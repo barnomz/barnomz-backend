@@ -62,10 +62,10 @@ class ClassSessionSerializer(serializers.ModelSerializer):
             'جمعه': 6,
         }
         day_list = []
-        if (day_to_int.get(day_name) == 3 or day_to_int.get(day_name) == 1) and obj.course_session.unit_count == 3:
+        if (day_to_int.get(day_name) == 3 or day_to_int.get(day_name) == 1) and obj.course_session.unit_count >= 3:
             day_list.append(1)
             day_list.append(3)
-        elif (day_to_int.get(day_name) == 0 or day_to_int.get(day_name) == 2) and obj.course_session.unit_count == 3:
+        elif (day_to_int.get(day_name) == 0 or day_to_int.get(day_name) == 2) and obj.course_session.unit_count >= 3:
             day_list.append(0)
             day_list.append(2)
         else:

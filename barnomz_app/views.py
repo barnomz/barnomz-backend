@@ -258,20 +258,24 @@ class RemoveComment(APIView):
 def like_comment(request, comment_id):
     try:
         serializer = CommentSerializer(data=request.data)
-        comment = CommentOnProfessors.objects.get(id=comment_id)
-        # Check if the user has already liked/disliked this comment
-        existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
-        if existing_like:
-            if existing_like.like:
-                return Response({'message': 'You have already liked this comment.'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            existing_like.like = True
-            existing_like.save()
-            return Response({'message': 'Your dislike has been changed to a like.', 'data': serializer.data},
-                            status=status.HTTP_200_OK)
-        else:
-            CommentLike.objects.create(user=request.user, comment=comment, like=True)
-            return Response({'message': 'You liked the comment.', 'data': serializer.data}, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            comment = CommentOnProfessors.objects.get(id=comment_id)
+            # Check if the user has already liked/disliked this comment
+            existing_like = CommentLike.objects.filter(user=request.user, comment=comment).first()
+            if existing_like:
+                if existing_like.like:
+                    return Response({'message': 'You have already liked this comment.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                existing_like.like = True
+                existing_like.save()
+                serializer.save()
+                return Response({'message': 'Your dislike has been changed to a like.', 'data': serializer.data},
+                                status=status.HTTP_200_OK)
+            else:
+                CommentLike.objects.create(user=request.user, comment=comment, like=True)
+                serializer.save()
+                return Response({'message': 'You liked the comment.', 'data': serializer.data},
+                                status=status.HTTP_200_OK)
     except CommentOnProfessors.DoesNotExist:
         return Response({'message': 'Comment not found.'}, status=status.HTTP_404_NOT_FOUND)
 

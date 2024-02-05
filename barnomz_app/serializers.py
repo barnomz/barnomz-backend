@@ -1,3 +1,4 @@
+from django.utils.dateparse import parse_date, parse_time
 from rest_framework import serializers
 
 from barnomz_app.models import *
@@ -5,12 +6,34 @@ from barnomz_app.models import *
 
 class CourseSerializer(serializers.ModelSerializer):
     presented_by = serializers.CharField(max_length=255)
+    exam_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = ['id', 'course_name', 'course_code', 'unit_count', 'presented_by', 'group',
-                  'final_exam_date', 'final_exam_time', 'number_of_petitioners', 'number_of_capacity',
+                  'exam_date', 'number_of_petitioners', 'number_of_capacity',
                   'number_of_enrolled', 'location', 'department', 'warning', 'grade', 'info']
+
+    @staticmethod
+    def get_exam_date(obj):
+        exam_date_str = obj.final_exam_date
+        if isinstance(exam_date_str, str):
+            exam_date = parse_date(exam_date_str.replace('/', '-'))
+        else:
+            exam_date = exam_date_str
+
+        exam_time_str = obj.final_exam_time
+        if isinstance(exam_time_str, str):
+            exam_time = parse_time(exam_time_str)
+        else:
+            exam_time = exam_time_str
+
+        if exam_date and exam_time:
+            formatted_date = exam_date.strftime('%Y-%m-%d')
+            formatted_time = exam_time.strftime('%H:%M')
+            exam_datetime = f'{formatted_date}T{formatted_time}'
+            return exam_datetime
+        return None
 
     def get_presented_by(self):
         return Professor.objects.get(self.presented_by).full_name
@@ -18,12 +41,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class ClassSessionSerializer(serializers.ModelSerializer):
     day_of_week = serializers.SerializerMethodField()
+    start_time = serializers.SerializerMethodField()
+    end_time = serializers.SerializerMethodField()
 
     class Meta:
         model = ClassSession
         fields = ['id', 'day_of_week', 'start_time', 'end_time', 'location']
 
-    def get_day_of_week(self, obj):
+    @staticmethod
+    def get_day_of_week(obj):
         # Using the object instance to get the day_of_week attribute
         day_name = obj.day_of_week
         day_to_int = {
@@ -35,7 +61,28 @@ class ClassSessionSerializer(serializers.ModelSerializer):
             'پنجشنبه': 5,
             'جمعه': 6,
         }
-        return day_to_int.get(day_name, None)
+        day_list = []
+        if (day_to_int.get(day_name) == 3 or day_to_int.get(day_name) == 1) and obj.course_session.unit_count == 3:
+            day_list.append(1)
+            day_list.append(3)
+        elif (day_to_int.get(day_name) == 0 or day_to_int.get(day_name) == 2) and obj.course_session.unit_count == 3:
+            day_list.append(0)
+            day_list.append(2)
+        else:
+            day_list.append(day_to_int.get(day_name))
+        return day_list
+
+    @staticmethod
+    def get_start_time(obj):
+        if obj.start_time is None:
+            return None
+        return obj.start_time.strftime('%H:%M')
+
+    @staticmethod
+    def get_end_time(obj):
+        if obj.end_time is None:
+            return None
+        return obj.end_time.strftime('%H:%M')
 
 
 class ClassSessionAllDataSerializer(ClassSessionSerializer):
@@ -43,9 +90,12 @@ class ClassSessionAllDataSerializer(ClassSessionSerializer):
     course_code = serializers.SerializerMethodField()
     presented_by = serializers.SerializerMethodField()
     group = serializers.SerializerMethodField()
+    unit_count = serializers.SerializerMethodField()
+    exam_date = serializers.SerializerMethodField()
 
     class Meta(ClassSessionSerializer.Meta):
-        fields = ClassSessionSerializer.Meta.fields + ['course_name', 'course_code', 'presented_by', 'group']
+        fields = ClassSessionSerializer.Meta.fields + ['course_name', 'course_code', 'presented_by', 'group',
+                                                       'unit_count', 'exam_date']
 
     @staticmethod
     def get_course_name(obj):
@@ -62,6 +112,31 @@ class ClassSessionAllDataSerializer(ClassSessionSerializer):
     @staticmethod
     def get_group(obj):
         return obj.course_session.group
+
+    @staticmethod
+    def get_unit_count(obj):
+        return obj.course_session.unit_count
+
+    @staticmethod
+    def get_exam_date(obj):
+        exam_date_str = obj.course_session.final_exam_date
+        if isinstance(exam_date_str, str):
+            exam_date = parse_date(exam_date_str.replace('/', '-'))
+        else:
+            exam_date = exam_date_str
+
+        exam_time_str = obj.course_session.final_exam_time
+        if isinstance(exam_time_str, str):
+            exam_time = parse_time(exam_time_str)
+        else:
+            exam_time = exam_time_str
+
+        if exam_date and exam_time:
+            formatted_date = exam_date.strftime('%Y-%m-%d')
+            formatted_time = exam_time.strftime('%H:%M')
+            exam_datetime = f'{formatted_date}T{formatted_time}'
+            return exam_datetime
+        return None
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -108,13 +108,13 @@ def remove_course_from_schedule(request, schedule_id):
         schedule = Schedule.objects.get(pk=schedule_id, user=request.user)
         course_data = request.data
         course = ClassSession.objects.get(pk=course_data['id'])
-        schedule.classes.remove(course)
+        course_id = course.id
+        schedule.classes.remove(course_id)
         schedule.save()
-        all_schedules = Schedule.objects.filter(user=request.user)
-        serializer = ScheduleSerializer(all_schedules, many=True)
+        serializer = ScheduleSerializer(schedule)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except (Schedule.DoesNotExist, ClassSession.DoesNotExist):
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['PATCH'])

@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -26,29 +27,35 @@ var watchedDepartments = map[int]string{
 	40: "مهندسی_کامپیوتر",
 }
 
-const BotToken = ""
-const ChannelID = ""
-const AdminID = ""
+var dayOfWeekMap = map[string]int{
+	"شنبه":     0,
+	"یکشنبه":   1,
+	"دوشنبه":   2,
+	"سه شنبه":  3,
+	"چهارشنبه": 4,
+	"پنجشنبه":  5,
+	"جمعه":     6,
+}
+
 const UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
 const EduUsername = "99105475"
 const EduPassword = "0025148362"
 
 type Course struct {
-	ID string
-	// Name of the lesson
-	Name string
-	// Who teaches this course
-	Lecturer string
-	// Who many students can pick this course at total
-	Capacity int
-	// How many students has picked this course
+	Code       string
+	Group      int
+	Name       string
+	Lecturer   string
+	Capacity   int
 	Registered int
-	// Units for this course
-	Units int
-}
-
-func (c *Course) String() string {
-	return c.Name + " - " + c.Lecturer + "\nID: " + c.ID + "\nUnits: " + strconv.Itoa(c.Units) + "\nRegistered: " + strconv.Itoa(c.Registered) + "\nCapacity: " + strconv.Itoa(c.Capacity)
+	Units      int
+	ExamDate   string
+	ExamTime   string
+	DaysOfWeek []int
+	StartTime  string
+	EndTime    string
+	Info       string
+	Department string
 }
 
 type StatusCodeError struct {
@@ -188,9 +195,9 @@ func CheckDiff(ctx context.Context, departmentID int, departmentName string) (in
 				// Now check the index
 				switch i {
 				case 0: // course ID
-					course.ID = text + "-"
+					course.Code = text
 				case 1: // course group
-					course.ID += text
+					course.Group, _ = strconv.Atoi(text)
 				case 2: // units
 					course.Units, _ = strconv.Atoi(text)
 				case 3: // name of course
@@ -201,14 +208,22 @@ func CheckDiff(ctx context.Context, departmentID int, departmentName string) (in
 					course.Registered, _ = strconv.Atoi(text)
 				case 7: // Lecturer name
 					course.Lecturer = text
+				case 8: // Exam date
+					course.ExamDate, course.ExamTime = ParseExamDateTime(text)
+				case 9: // Schedule
+					course.DaysOfWeek, course.StartTime, course.EndTime = ParseCourseSchedule(text)
+				case 11: // Info
+					course.Info = text
 				}
 			})
 			// If we couldn't get this row, just fuck it
 			if !ok {
 				return
 			}
+			// replace the _ with space in deparmentName
+			course.Department = strings.Replace(departmentName, "_", " ", -1)
 			// Replace the old course
-			Courses[course.ID] = course
+			Courses[course.Code] = course
 			coursesGot++
 		})
 	})
@@ -304,4 +319,45 @@ func GetRequest(ctx context.Context, method, url string, body io.Reader) *http.R
 
 func IsLogin(body []byte) bool {
 	return bytes.Contains(body, []byte("https://accounts.sharif.edu/cas/login?service=https://edu.sharif.edu/login.jsp"))
+}
+
+func ParseCourseSchedule(input string) ([]int, string, string) {
+	// Regex to extract the days, start time, and end time
+	re := regexp.MustCompile(`(?P<days>[^\d]+) از (?P<start>\d{1,2}:\d{2}) تا (?P<end>\d{1,2}:\d{2})`)
+	matches := re.FindStringSubmatch(input)
+
+	// Map to hold the names of matched groups
+	groupNames := re.SubexpNames()
+
+	result := make(map[string]string)
+	for i, match := range matches {
+		result[groupNames[i]] = match
+	}
+
+	days := strings.Split(result["days"], " و ")
+	daysOfWeek := make([]int, 0, len(days))
+	for _, day := range days {
+		if dayNum, exists := dayOfWeekMap[day]; exists {
+			daysOfWeek = append(daysOfWeek, dayNum)
+		}
+	}
+
+	return daysOfWeek, result["start"], result["end"]
+}
+
+func ParseExamDateTime(input string) (string, string) {
+	// log.Println("`" + input + "`")
+	re := regexp.MustCompile(`\s+(?P<date>\S+)\s+(?P<time>\d{2}:\d{2})\s+`)
+	matches := re.FindStringSubmatch(input)
+
+	// Map to hold the names of matched groups
+	groupNames := re.SubexpNames()
+	// log.Println("matches:", matches)
+
+	result := make(map[string]string)
+	for i, match := range matches {
+		result[groupNames[i]] = match
+	}
+	
+	return result["date"], result["time"]
 }

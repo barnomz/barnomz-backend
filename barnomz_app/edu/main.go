@@ -75,7 +75,7 @@ func IsServerError(err error) bool {
 
 var Courses = make(map[string]Course)
 var httpClient *http.Client
-var loginError = errors.New("redirected to login page")
+var errorLogin = errors.New("redirected to login page")
 
 func main() {
 	// Check startup restore
@@ -96,7 +96,7 @@ func main() {
 	if err != nil {
 		log.Println("fatal error:", err)
 	}
-	for errors.Is(err, loginError) || IsServerError(err) {
+	for errors.Is(err, errorLogin) || IsServerError(err) {
 		select {
 		case <-time.After(time.Minute):
 		case <-ctx.Done():
@@ -165,7 +165,7 @@ func CheckDiff(ctx context.Context, departmentID int, departmentName string) (in
 	// Check login page
 	doc.Find("title").Each(func(i int, selection *goquery.Selection) {
 		if selection.Text() == "سامانه آموزش - دانشگاه صنعتی شریف" {
-			err = loginError
+			err = errorLogin
 		}
 	})
 	if err != nil {
@@ -281,7 +281,7 @@ func WarmUp(ctx context.Context) error {
 		return StatusCodeError{resp.StatusCode}
 	}
 	if IsLogin(body) {
-		return loginError
+		return errorLogin
 	}
 	// Change to courses
 	resp, err = httpClient.Do(GetRequest(ctx, "POST", "https://edu.sharif.edu/register.do",
@@ -295,7 +295,7 @@ func WarmUp(ctx context.Context) error {
 		return StatusCodeError{resp.StatusCode}
 	}
 	if IsLogin(body) {
-		return loginError
+		return errorLogin
 	}
 	return nil
 }

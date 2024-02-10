@@ -74,7 +74,6 @@ func IsServerError(err error) bool {
 }
 
 var Courses = make(map[string]Course)
-var firstScrap = true
 var httpClient *http.Client
 var loginError = errors.New("redirected to login page")
 
@@ -90,7 +89,6 @@ func main() {
 			log.Fatalln("cannot unmarshal json:", err)
 		}
 		_ = file.Close()
-		firstScrap = false
 	}
 	// Login and retry
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt)

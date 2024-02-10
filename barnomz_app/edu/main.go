@@ -51,14 +51,6 @@ func (c *Course) String() string {
 	return c.Name + " - " + c.Lecturer + "\nID: " + c.ID + "\nUnits: " + strconv.Itoa(c.Units) + "\nRegistered: " + strconv.Itoa(c.Registered) + "\nCapacity: " + strconv.Itoa(c.Capacity)
 }
 
-func (c *Course) StringDiffCapacity(old int) string {
-	return c.Name + " - " + c.Lecturer + "\nID: " + c.ID + "\nUnits: " + strconv.Itoa(c.Units) + "\nRegistered: " + strconv.Itoa(c.Registered) + "\nCapacity: " + strconv.Itoa(old) + " → " + strconv.Itoa(c.Capacity)
-}
-
-func (c *Course) StringDiffRegistered(old int) string {
-	return c.Name + " - " + c.Lecturer + "\nID: " + c.ID + "\nUnits: " + strconv.Itoa(c.Units) + "\nRegistered: " + strconv.Itoa(old) + " → " + strconv.Itoa(c.Registered) + "\nCapacity: " + strconv.Itoa(c.Capacity)
-}
-
 type StatusCodeError struct {
 	ReceivedStatusCode int
 }

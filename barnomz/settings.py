@@ -95,10 +95,10 @@ WSGI_APPLICATION = "barnomz.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME', 'postgres'),
-        'USER': os.environ.get('DATABASE_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'postgres_password'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),  # Use 'db' to match the service name in docker-compose.yml
+        'NAME': os.environ.get('DATABASE_NAME', 'barnomz'),
+        'USER': os.environ.get('DATABASE_USER', 'soheil'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', '123456789'),
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),  # Use 'db' to match the service name in docker-compose.yml
         'PORT': '5432',
     }
 }

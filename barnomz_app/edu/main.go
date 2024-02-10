@@ -240,7 +240,7 @@ func Login(ctx context.Context) error {
 		return StatusCodeError{ReceivedStatusCode: resp.StatusCode}
 	}
 	// Get body
-	body, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	_ = resp.Body.Close()
 	if err != nil {
 		return err
@@ -260,7 +260,7 @@ func Login(ctx context.Context) error {
 		return err
 	}
 	// Check status code
-	body, _ = io.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	_ = resp.Body.Close()
 	if !bytes.Contains(body, []byte("خروج")) {
 		return errors.New("body is invalid")

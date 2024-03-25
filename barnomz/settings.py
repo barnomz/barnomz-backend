@@ -39,8 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     'rest_framework.authtoken',
-    'barnomz_app',
-    'captcha'
+    "barnomz_app",
+    "corsheaders",
+    "captcha"
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -98,7 +99,8 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME', 'barnomz'),
         'USER': os.environ.get('DATABASE_USER', 'soheil'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD', '123456789'),
-        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),  # Use 'db' to match the service name in docker-compose.yml
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+        # Use 'db' to match the service name in docker-compose.yml
         'PORT': '5432',
     }
 }

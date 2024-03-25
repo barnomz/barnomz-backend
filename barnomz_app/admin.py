@@ -10,6 +10,7 @@ admin.site.register(Schedule)
 admin.site.register(CommentOnProfessors)
 
 
+@admin.action(description='Fetch courses')
 def fetch_courses(modeladmin, request, queryset):
     script_path = './edu/main.go'
     command = f'go run {script_path}'
@@ -21,11 +22,8 @@ def fetch_courses(modeladmin, request, queryset):
         modeladmin.message_user(request, f'Error executing script: {e.output}', level='error')
 
 
-fetch_courses.short_description = "Fetch courses"
-
-
-class FetchCoursesModelAdmin(admin.ModelAdmin):
+class CourseAdmin(admin.ModelAdmin):
     actions = [fetch_courses]
 
 
-admin.site.register(Course, FetchCoursesModelAdmin)
+admin.site.register(Course, CourseAdmin)

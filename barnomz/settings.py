@@ -26,7 +26,10 @@ SECRET_KEY = "django-insecure-bni+6$o)%h)51igtkynu!7b&fus_if!g^#_ry9c9y*_a3gdp#b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "api.barnomz.ir",
+    "localhost"
+]
 
 # Application definition
 

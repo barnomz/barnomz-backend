@@ -8,3 +8,4 @@ gnupg~=2.3.1
 beautifulsoup4~=4.12.3
 psycopg2
 psycopg
+django-cors-headers

@@ -23,3 +23,6 @@ RUN touch /var/log/gunicorn/access.log
 RUN touch /var/log/gunicorn/error.log
 
 EXPOSE 8000
+
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

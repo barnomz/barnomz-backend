@@ -24,5 +24,5 @@ RUN touch /var/log/gunicorn/error.log
 
 EXPOSE 8000
 
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+RUN python manage.py migrate
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

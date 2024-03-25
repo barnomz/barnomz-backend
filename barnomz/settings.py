@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-bni+6$o)%h)51igtkynu!7b&fus_if!g^#_ry9c9y*_a3gdp#b"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
 
 ALLOWED_HOSTS = [
     "api.barnomz.ir",

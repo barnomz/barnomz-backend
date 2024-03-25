@@ -31,6 +31,12 @@ ALLOWED_HOSTS = [
     "localhost"
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.barnomz.ir',
+]
+
+CSRF_COOKIE_DOMAIN = '.barnomz.ir'
+
 # Application definition
 
 INSTALLED_APPS = [

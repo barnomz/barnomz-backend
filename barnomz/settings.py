@@ -108,7 +108,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'barnomz'),
         'USER': os.environ.get('POSTGRES_USER', 'soheil'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '123456789'),
-        'HOST': os.environ.get('DATABASE_PRIVATE_URL', 'localhost'),
+        'HOST': os.environ.get('PGPRIVATEHOST', 'localhost'),
         # Use 'db' to match the service name in docker-compose.yml
         'PORT': '5432',
     }
